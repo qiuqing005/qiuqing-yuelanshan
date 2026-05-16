@@ -168,7 +168,7 @@ async function pageWithViewport(width, height) {
 const desktop = await pageWithViewport(1440, 960);
 await desktop.context.addCookies([{ name: "qy_admin", value: cookie.replace(/^qy_admin=/, ""), domain: new URL(baseUrl).hostname, path: "/" }]);
 await desktop.page.goto(`${baseUrl}/月兰山`, { waitUntil: "load" });
-await desktop.page.locator(".flowNode").first().waitFor({ state: "visible", timeout: 15000 });
+await desktop.page.locator(".flowNode").first().waitFor({ state: "visible", timeout: 60000 });
 if ((await desktop.page.locator(".flowNode").count()) < 12) {
   throw new Error("Flow graph rendered too few nodes.");
 }

@@ -4,6 +4,7 @@ const fsp = require("node:fs/promises");
 const path = require("node:path");
 const vm = require("node:vm");
 const crypto = require("node:crypto");
+const zlib = require("node:zlib");
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
@@ -46,6 +47,21 @@ const ALLOWED_UPLOAD_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".
 function send(res, status, body, headers = {}) {
   res.writeHead(status, headers);
   res.end(body);
+}
+
+function sendMaybeGzip(req, res, status, body, headers = {}) {
+  const acceptsGzip = /\bgzip\b/i.test(req.headers["accept-encoding"] || "");
+  if (!acceptsGzip || Buffer.byteLength(body) < 1024) {
+    send(res, status, body, headers);
+    return;
+  }
+  const compressed = zlib.gzipSync(body);
+  send(res, status, compressed, {
+    ...headers,
+    "Content-Encoding": "gzip",
+    "Content-Length": compressed.length,
+    Vary: "Accept-Encoding",
+  });
 }
 
 function noStoreHeaders(contentType) {
@@ -587,7 +603,7 @@ async function handleEditorApi(req, res, pathname) {
   }
 
   if (pathname === "/api/editor/base" && req.method === "GET") {
-    send(res, 200, getBaseGameDataJson(), noStoreHeaders("application/json; charset=utf-8"));
+    sendMaybeGzip(req, res, 200, getBaseGameDataJson(), noStoreHeaders("application/json; charset=utf-8"));
     return;
   }
 
