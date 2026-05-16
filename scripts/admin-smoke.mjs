@@ -167,7 +167,7 @@ async function pageWithViewport(width, height) {
 
 const desktop = await pageWithViewport(1440, 960);
 await desktop.context.addCookies([{ name: "qy_admin", value: cookie.replace(/^qy_admin=/, ""), domain: new URL(baseUrl).hostname, path: "/" }]);
-await desktop.page.goto(`${baseUrl}/月兰山`, { waitUntil: "networkidle" });
+await desktop.page.goto(`${baseUrl}/月兰山`, { waitUntil: "load" });
 await desktop.page.locator(".flowNode").first().waitFor({ state: "visible", timeout: 15000 });
 if ((await desktop.page.locator(".flowNode").count()) < 12) {
   throw new Error("Flow graph rendered too few nodes.");
@@ -208,7 +208,7 @@ await desktop.context.close();
 
 const mobile = await pageWithViewport(390, 844);
 await mobile.context.addCookies([{ name: "qy_admin", value: cookie.replace(/^qy_admin=/, ""), domain: new URL(baseUrl).hostname, path: "/" }]);
-await mobile.page.goto(`${baseUrl}/月兰山`, { waitUntil: "networkidle" });
+await mobile.page.goto(`${baseUrl}/月兰山`, { waitUntil: "load" });
 await mobile.page.locator(".topbar").waitFor({ state: "visible", timeout: 10000 });
 await mobile.page.locator(".flowNode").first().waitFor({ state: "visible", timeout: 15000 });
 await mobile.page.screenshot({ path: path.join(outDir, "admin-mobile.png"), fullPage: true });

@@ -244,7 +244,11 @@ function verifyPassword(username, password) {
   return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 }
 
+let baseGameDataCache = null;
+let baseGameDataJsonCache = "";
+
 function getBaseGameData() {
+  if (baseGameDataCache) return baseGameDataCache;
   const source = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
   const cut = source.indexOf("let EDITOR_CONFIG");
   if (cut < 0) throw new Error("Unable to locate editor config boundary in app.js.");
@@ -262,7 +266,13 @@ globalThis.__QY_BASE__ = {
 };`;
   const context = vm.createContext({ console });
   vm.runInContext(script, context, { timeout: 1000 });
-  return context.__QY_BASE__;
+  baseGameDataCache = context.__QY_BASE__;
+  return baseGameDataCache;
+}
+
+function getBaseGameDataJson() {
+  if (!baseGameDataJsonCache) baseGameDataJsonCache = JSON.stringify(getBaseGameData(), null, 2);
+  return baseGameDataJsonCache;
 }
 
 function storySummaryFromOverrides(storyId, overrides = {}, base = getBaseGameData(), fallback = {}) {
@@ -577,7 +587,7 @@ async function handleEditorApi(req, res, pathname) {
   }
 
   if (pathname === "/api/editor/base" && req.method === "GET") {
-    sendJson(res, 200, getBaseGameData());
+    send(res, 200, getBaseGameDataJson(), noStoreHeaders("application/json; charset=utf-8"));
     return;
   }
 
