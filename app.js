@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 
-const RESOURCE_VERSION = "202605161700";
+const RESOURCE_VERSION = "202605162151";
 
 const ASSETS = {
   night: "./assets/images/bg-night-road.png",
