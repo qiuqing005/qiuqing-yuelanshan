@@ -300,9 +300,25 @@ const JOURNALS = {
   },
 };
 
-const endingChoices = [{ label: "重新开始", reset: true, primary: true }];
+const endingChoices = [{ label: "进入结局事后谈", next: "endingAftertalk", primary: true }];
 
 const SCENES = {
+  endingAftertalk: {
+    chapter: "结局事后谈",
+    code: "AFTER",
+    speaker: "灯后余声",
+    bg: ASSETS.festival,
+    persona: "none",
+    dynamicAftertalk: true,
+    text: [
+      "纸灯落下之后，热闹会退到远处。你终于可以不急着修正，也不急着重来。",
+      "先把这个结局放在桌上，看看它留下了什么，再决定要不要再次游玩。",
+    ],
+    choices: [
+      { label: "再次游玩", reset: true, primary: true, dynamicLabel: "replayRemaining" },
+    ],
+  },
+
   intro: {
     chapter: "序章",
     code: "00",
@@ -656,7 +672,11 @@ const SCENES = {
       "你后退时踩碎了那枚硬币。碎响像一个名字落地。怪谈得逞，灯光一下子暗下去。",
       "电话自动挂断。你被赶回起点：先经历，再复原。",
     ],
-    choices: [{ label: "重新开始", reset: true, primary: true }],
+    ending: true,
+    endingKind: "bad",
+    endingTitle: "玻璃复刻",
+    endingSummary: "你把唯一一句交给玻璃里的复刻声音，怪谈替你把路退回起点。",
+    choices: endingChoices,
   },
 
   lampOne: {
@@ -3162,6 +3182,185 @@ const SCENES = {
   },
 };
 
+const LARGE_EXPANSION = {
+  openings: [
+    ["opening01", "门缝雨声", "从门缝里的雨声开局", ASSETS.mirror, "雨声"],
+    ["opening02", "茶票背面", "从茶票背面的地址开局", ASSETS.tea, "茶票"],
+    ["opening03", "旧路末班", "从旧路末班车开局", ASSETS.night, "末班车"],
+    ["opening04", "镜室晨雾", "从镜室晨雾开局", ASSETS.mirror, "镜雾"],
+    ["opening05", "校医空灯", "从校医室空灯开局", ASSETS.gate, "空灯"],
+    ["opening06", "图书归还", "从图书室归还处开局", ASSETS.gate, "归还处"],
+    ["opening07", "祭灯预告", "从祭灯预告单开局", ASSETS.festival, "预告单"],
+    ["opening08", "无声演练", "从无声演练手账开局", ASSETS.festival, "手账"],
+  ],
+  theaters: [
+    ["theater01", "信封夹层小剧场", ASSETS.mirror, "夹层"],
+    ["theater02", "雨棚座位小剧场", ASSETS.tea, "雨棚"],
+    ["theater03", "售票亭玻璃小剧场", ASSETS.night, "玻璃"],
+    ["theater04", "旧账桌纸屑小剧场", ASSETS.festival, "纸屑"],
+    ["theater05", "裂镜背面小剧场", ASSETS.mirror, "裂镜"],
+    ["theater06", "祝词篮底小剧场", ASSETS.festival, "篮底"],
+    ["theater07", "公交站牌小剧场", ASSETS.night, "站牌"],
+    ["theater08", "校医录音小剧场", ASSETS.gate, "录音"],
+    ["theater09", "图书归还小剧场", ASSETS.gate, "书脊"],
+    ["theater10", "纸门出口小剧场", ASSETS.festival, "纸门"],
+    ["theater11", "十二朱印小剧场", ASSETS.festival, "朱印"],
+    ["theater12", "黎明回执小剧场", ASSETS.festival, "回执"],
+  ],
+  mainlines: [
+    ["mainline01", "旧路证词主线", "进入新增主线：旧路证词", ASSETS.night, "旧路"],
+    ["mainline02", "镜室互认主线", "进入新增主线：镜室互认", ASSETS.mirror, "镜室"],
+    ["mainline03", "祭灯留白主线", "进入新增主线：祭灯留白", ASSETS.festival, "祭灯"],
+  ],
+};
+
+function generatedText(kind, title, motif, index, total) {
+  const step = `${index}/${total}`;
+  if (kind === "opening") {
+    return [
+      `【${title} · ${step}】${motif}先于信封出现，像把今晚的顺序轻轻拨乱。`,
+      `你听见秋清的声音停在很远的地方：“如果从这里开始，就不要急着把我解释完。”`,
+      `月兰山没有出现，只在空白处留下一行冷静的批注：开局不是答案，只是第一枚可追踪的针脚。`,
+    ];
+  }
+  if (kind === "theater") {
+    return [
+      `【${title} · ${step}】你没有立刻退回原处，而是把刚才差点做出的选择夹进${motif}里。`,
+      `秋清像在旁边听一段很短的戏，偶尔提醒你：“如果它会回来，就让它带着证词回来。”`,
+      `这段小剧场不替你修正错误，只把错误留下的光影排成可复查的伏笔。`,
+    ];
+  }
+  return [
+    `【${title} · ${step}】${motif}把主线拉长一格，证词、名字和沉默都被重新摆上桌面。`,
+    `秋清问：“这一段也必须走完吗？”你回答：“不是必须，是我不想再把省略误会成勇敢。”`,
+    `月兰山的批注压在页角：长线不是拖延。长线让每一次判断都留下来源。`,
+  ];
+}
+
+function addLinearSequence({ id, type, title, bg, motif, length, finalChoice, finalNext, returnToStored = false }) {
+  for (let index = 1; index <= length; index += 1) {
+    const sceneId = `${id}_${String(index).padStart(2, "0")}`;
+    const nextId = `${id}_${String(index + 1).padStart(2, "0")}`;
+    const final = index === length;
+    SCENES[sceneId] = {
+      chapter: type === "opening" ? "新增开局" : type === "theater" ? "小剧场" : "新增主线",
+      code: `${id.toUpperCase()}-${String(index).padStart(2, "0")}`,
+      speaker: index % 3 === 0 ? "月兰山" : index % 2 === 0 ? "秋清" : "旁白",
+      bg,
+      portrait: index % 3 === 0 ? ASSETS.yuelan : index % 2 === 0 ? ASSETS.qiuqing : "",
+      persona: index % 3 === 0 ? "yuelan" : index % 2 === 0 ? "qiuqing" : "none",
+      expansionGroup: { type, id, index, length },
+      text: generatedText(type, title, motif, index, length),
+      effects: final ? { flags: [`${id}Complete`], stats: { logic: 1, like: type === "theater" ? 0 : 1 } } : { stats: { logic: 1 } },
+      choices: final
+        ? [returnToStored
+          ? { label: finalChoice, returnToStored: true, primary: true }
+          : { label: finalChoice, next: finalNext, primary: true }]
+        : [{ label: `继续${title}第 ${index + 1} 段`, next: nextId, primary: true }],
+    };
+  }
+}
+
+function incomingSceneMap() {
+  const map = {};
+  Object.entries(SCENES).forEach(([sceneId, scene]) => {
+    (scene.choices || []).forEach((choice) => {
+      if (!choice.next) return;
+      if (!map[choice.next]) map[choice.next] = [];
+      map[choice.next].push(sceneId);
+    });
+  });
+  return map;
+}
+
+function foreshadowChoiceLabel(theaterTitle, index) {
+  const verbs = [
+    "把这次迟疑交给",
+    "沿着旁枝进入",
+    "把未说完的话放进",
+    "让这条伏笔展开成",
+  ];
+  return `${verbs[index % verbs.length]}${theaterTitle}`;
+}
+
+function installLargeExpansionContent() {
+  LARGE_EXPANSION.openings.forEach(([id, title, entryLabel, bg, motif]) => {
+    addLinearSequence({
+      id,
+      type: "opening",
+      title,
+      bg,
+      motif,
+      length: 20,
+      finalChoice: "带着这段开局翻检烧毁的信封",
+      finalNext: "ashPage",
+    });
+    if (!SCENES.intro.choices.some((choice) => choice.next === `${id}_01`)) {
+      SCENES.intro.choices.splice(Math.max(1, SCENES.intro.choices.length - 1), 0, { label: entryLabel, next: `${id}_01`, primary: false });
+    }
+  });
+
+  SCENES.expandedMainlineHub = {
+    chapter: "新增主线",
+    code: "MAIN-HUB",
+    speaker: "手账",
+    bg: ASSETS.festival,
+    persona: "none",
+    text: [
+      "烧页之间夹着三条更长的主线目录。它们不改写原本的规则，只把旧路、镜室和祭灯夜各自展开成一条可以单独追踪的长线。",
+      "秋清没有催你选哪一条。月兰山也没有把目录合上。今晚允许你把绕路当成取证，而不是逃避。",
+    ],
+    choices: LARGE_EXPANSION.mainlines.map(([id, title, entryLabel]) => ({ label: entryLabel, next: `${id}_01`, primary: false })),
+  };
+  if (!SCENES.ashPuzzle.choices.some((choice) => choice.next === "expandedMainlineHub")) {
+    SCENES.ashPuzzle.choices.push({ label: "翻开三条新增主线目录", next: "expandedMainlineHub" });
+  }
+  LARGE_EXPANSION.mainlines.forEach(([id, title, , bg, motif]) => {
+    addLinearSequence({
+      id,
+      type: "mainline",
+      title,
+      bg,
+      motif,
+      length: 80,
+      finalChoice: "把这条长线并回茶票地址",
+      finalNext: "ashLedger",
+    });
+  });
+
+  LARGE_EXPANSION.theaters.forEach(([id, title, bg, motif]) => {
+    addLinearSequence({
+      id,
+      type: "theater",
+      title,
+      bg,
+      motif,
+      length: 40,
+      finalChoice: "把这段小剧场作为伏笔带回主线",
+      returnToStored: true,
+    });
+  });
+
+  const incoming = incomingSceneMap();
+  let theaterIndex = 0;
+  Object.entries(SCENES).forEach(([sceneId, scene]) => {
+    (scene.choices || []).forEach((choice) => {
+      if (!choice.back) return;
+      const [theaterId, theaterTitle] = LARGE_EXPANSION.theaters[theaterIndex % LARGE_EXPANSION.theaters.length];
+      const returnTo = incoming[sceneId]?.[0] || "intro";
+      delete choice.back;
+      choice.label = foreshadowChoiceLabel(theaterTitle, theaterIndex);
+      choice.next = `${theaterId}_01`;
+      choice.returnTo = returnTo;
+      choice.foreshadow = true;
+      choice.primary = true;
+      theaterIndex += 1;
+    });
+  });
+}
+
+installLargeExpansionContent();
+
 const SCENE_EXPANSIONS = {
   intro: [
     "你把信封翻过来，发现封口并不是胶水粘住的，而是被红线缝过。线脚细密得不像手工，像某个人把一段很长的犹豫一针一针穿进纸里。",
@@ -3624,6 +3823,8 @@ function defaultState() {
     backStack: [],
     history: [],
     endings: [],
+    lastEnding: "",
+    returnScene: "",
     finalMissing: [],
     clueVersions: {},
     confessionUsed: false,
@@ -3746,6 +3947,7 @@ function resetGame() {
   state = defaultState();
   state.endings = endings;
   localStorage.removeItem(STORAGE_KEY);
+  saveState();
   render();
 }
 
@@ -3772,6 +3974,7 @@ function endingSummary(scene) {
 
 function recordEnding(sceneId, scene) {
   if (!scene?.ending) return;
+  state.lastEnding = sceneId;
   if (!Array.isArray(state.endings)) state.endings = [];
   const existing = state.endings.find((ending) => ending.scene === sceneId);
   if (existing) return;
@@ -3929,6 +4132,14 @@ function choose(choice) {
     resetGame();
     return;
   }
+  if (choice.returnToStored) {
+    playPage();
+    const target = state.returnScene && SCENES[state.returnScene] ? state.returnScene : "intro";
+    state.returnScene = "";
+    addHistory({ action: choice.label || "把伏笔带回主线", to: target });
+    setScene(target);
+    return;
+  }
   if (choice.back) {
     playPage();
     goBack(choice.label || "回到刚才的岔口", { preserveProgress: true, fallbackToHistory: true });
@@ -3940,6 +4151,7 @@ function choose(choice) {
   state.backStack.push({ snapshot: snapshotForBack() });
   if (state.backStack.length > 80) state.backStack = state.backStack.slice(-80);
   if (choice.confession) state.confessionUsed = true;
+  if (choice.returnTo) state.returnScene = choice.returnTo;
   addHistory({ action: choice.label, confession: Boolean(choice.confession) });
   applyEffects(choice.effects);
   if (finalWinChoice) {
@@ -3972,15 +4184,49 @@ function presenceText(persona) {
   }[persona || "none"];
 }
 
+function totalEndingCount() {
+  return Object.values(SCENES).filter((scene) => scene.ending).length;
+}
+
+function remainingEndingCount() {
+  const endings = Array.isArray(state.endings) ? state.endings : [];
+  return Math.max(0, totalEndingCount() - endings.length);
+}
+
+function choiceLabel(choice) {
+  if (choice.dynamicLabel === "replayRemaining") {
+    return `再次游玩（还有 ${remainingEndingCount()} 个结局未达成）`;
+  }
+  return choice.label || "";
+}
+
+function aftertalkParagraphs(scene) {
+  const ending = SCENES[state.lastEnding] || null;
+  if (!ending) return scene.text || [];
+  const kindText = ending.endingKind === "good" || state.lastEnding === "win" ? "好结局" : ending.endingKind === "branch" ? "岔路结局" : "坏结局";
+  return [
+    `【${kindText}达成】${endingTitle(ending, state.lastEnding)}`,
+    endingSummary(ending),
+    "灯火退到远处后，秋清和月兰山都没有立刻评价你。事后谈不是惩罚，也不是奖励，只是把这一条路留下的因果重新放回桌面。",
+    `你已经达成 ${Array.isArray(state.endings) ? state.endings.length : 0} / ${totalEndingCount()} 个结局。还有 ${remainingEndingCount()} 个结局未达成。`,
+    "如果再次游玩，已收集的结局会继续保留；这次留下的判断，也会成为下一次辨认边界的伏笔。",
+  ];
+}
+
 function renderText(scene) {
-  const paragraphs = [...scene.text, ...(SCENE_EXPANSIONS[state.scene] || [])];
+  const paragraphs = scene.dynamicAftertalk
+    ? aftertalkParagraphs(scene)
+    : [...scene.text, ...(SCENE_EXPANSIONS[state.scene] || [])];
   if (state.scene === (EDITOR_CONFIG.finalGate?.missingScene || "badFinalMissing") && state.finalMissing?.length) {
     paragraphs.push(`缺少：${state.finalMissing.join("、")}`);
   }
   renderToken += 1;
   const text = $("text");
   text.classList.remove("textExit");
-  text.innerHTML = paragraphs.map((paragraph, index) =>
+  const notice = scene.ending
+    ? `<div class="endingNotice ${(scene.endingKind || (state.scene === "win" ? "good" : "bad"))}Notice"><strong>${scene.endingKind === "good" || state.scene === "win" ? "好结局达成" : "坏结局/岔路达成"}</strong><span>${escapeHtml(endingTitle(scene))}</span></div>`
+    : "";
+  text.innerHTML = notice + paragraphs.map((paragraph, index) =>
     `<p class="streamLine" style="--line-delay:${Math.min(index * 46, 320)}ms">${escapeHtml(paragraph)}</p>`
   ).join("");
 }
@@ -4005,7 +4251,7 @@ function renderChoices(scene) {
     const button = document.createElement("button");
     button.className = "choice";
     button.type = "button";
-    button.textContent = choice.label;
+    button.textContent = choiceLabel(choice);
     button.style.setProperty("--choice-delay", `${Math.min(index * 42, 360)}ms`);
     const finalWinChoice = isFinalWinChoice(choice);
     const disabledByReq = !hasRequirement(choice.requires) || !hasTypedRequirements(choice) || (!finalWinChoice && !hasRules(choice.requiresRules));
@@ -4104,14 +4350,14 @@ function renderHistory() {
     <section class="endingArchive">
       <div class="archiveHeader">
         <strong>结局收集</strong>
-        <span>${endings.length} / ${Object.values(SCENES).filter((scene) => scene.ending).length}</span>
+        <span>${endings.length} / ${totalEndingCount()} · 还有 ${remainingEndingCount()} 个未达成</span>
       </div>
       ${endings.length ? endings.slice().reverse().map((ending) => `
         <div class="endingEntry ${escapeHtml(ending.kind || "bad")}Ending">
           <h3>${escapeHtml(ending.title)}</h3>
           <p>${escapeHtml(ending.summary)}</p>
         </div>
-      `).join("") : `<div class="historyEntry"><h3>暂无结局</h3><p>失败、岔路和最后答复会在这里保留，不会因重新开始而消失。</p></div>`}
+      `).join("") : `<div class="historyEntry"><h3>暂无结局</h3><p>失败、岔路和最后答复会在这里保留；再次游玩时，已收集的结局不会消失。</p></div>`}
     </section>
   `;
 
@@ -4150,6 +4396,8 @@ function render() {
   const stage = $("stage");
   if (scene.bg) stage.style.setProperty("--scene-bg", `url("${versionedAssetUrl(scene.bg)}")`);
   else stage.style.removeProperty("--scene-bg");
+  stage.classList.toggle("endingStage", Boolean(scene.ending));
+  stage.dataset.endingKind = scene.ending ? (scene.endingKind || (state.scene === "win" ? "good" : "bad")) : "";
   stage.classList.remove("flash");
   requestAnimationFrame(() => stage.classList.add("flash"));
 

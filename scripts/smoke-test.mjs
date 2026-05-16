@@ -45,6 +45,31 @@ async function click(page, label) {
   await assertNoChoiceRiskHints(page);
 }
 
+async function clickChoiceStartingWith(page, prefix) {
+  const label = await page.evaluate((prefixText) =>
+    Array.from(document.querySelectorAll(".choice"))
+      .map((button) => button.textContent?.trim() || "")
+      .find((text) => text.startsWith(prefixText)), prefix);
+  if (!label) throw new Error(`No choice starts with ${prefix}`);
+  await click(page, label);
+}
+
+async function drainGeneratedFlow(page) {
+  for (let guard = 0; guard < 100; guard += 1) {
+    const label = await page.evaluate(() => {
+      const labels = Array.from(document.querySelectorAll(".choice")).map((button) => button.textContent?.trim() || "");
+      return labels.find((text) => /^继续.+第 \d+ 段$/.test(text)) ||
+        labels.find((text) => text === "把这段小剧场作为伏笔带回主线") ||
+        labels.find((text) => text === "带着这段开局翻检烧毁的信封") ||
+        labels.find((text) => text === "把这条长线并回茶票地址") ||
+        "";
+    });
+    if (!label) return;
+    await click(page, label);
+  }
+  throw new Error("Generated flow did not settle within 100 steps.");
+}
+
 async function assertNoChoiceRiskHints(page) {
   const offenders = await page.evaluate(() =>
     Array.from(document.querySelectorAll(".choice")).flatMap((button) => {
@@ -163,12 +188,13 @@ await earlyEnding.page.goto(baseUrl, { waitUntil: "networkidle" });
 await earlyEnding.page.evaluate(() => localStorage.clear());
 await earlyEnding.page.reload({ waitUntil: "networkidle" });
 await click(earlyEnding.page, "不管规则，立刻给秋清发“我喜欢你”");
-await earlyEnding.page.getByRole("button", { name: "重新开始" }).waitFor({ state: "visible", timeout: 5000 });
-await click(earlyEnding.page, "重新开始");
+await earlyEnding.page.locator(".endingNotice").waitFor({ state: "visible", timeout: 5000 });
+await click(earlyEnding.page, "进入结局事后谈");
+await clickChoiceStartingWith(earlyEnding.page, "再次游玩");
 await earlyEnding.page.getByRole("tab", { name: "结局/历史" }).click();
 const endingArchiveText = await earlyEnding.page.locator("#historyPane").innerText();
-if (!endingArchiveText.includes("过早告白")) {
-  throw new Error("Ending archive did not persist a collected bad ending after reset.");
+if (!endingArchiveText.includes("过早告白") || !endingArchiveText.includes("还有")) {
+  throw new Error("Ending archive did not persist a collected bad ending or remaining-ending hint after replay.");
 }
 await screenshot(earlyEnding.page, "desktop-ending-archive.png");
 await earlyEnding.context.close();
@@ -207,7 +233,7 @@ const route = [
   "说明你要理解规则，不是利用规则",
   "问他为什么不爱任何人",
   "请求月兰山替你保管唯一一次表白",
-  "收回那个请求，回到刚才的判断",
+  "把这次迟疑交给信封夹层小剧场",
   "沿旧路走到废弃公交站",
   "带着这条判断回镜室",
   "先检查抽屉里的旧照片",
@@ -258,15 +284,18 @@ const route = [
 
 for (const label of route) {
   await click(desktop.page, label);
+  await drainGeneratedFlow(desktop.page);
   if (label === "请求月兰山替你保管唯一一次表白") {
     await screenshot(desktop.page, "desktop-bad-substitute.png");
   }
-  if (label === "收回那个请求，回到刚才的判断") {
+  if (label === "把这次迟疑交给信封夹层小剧场") {
     await desktop.page.getByRole("button", { name: "沿旧路走到废弃公交站" }).waitFor();
     await screenshot(desktop.page, "desktop-return-yuelan.png");
   }
 }
 
+await desktop.page.locator(".endingNotice").waitFor({ state: "visible", timeout: 5000 });
+await desktop.page.getByRole("button", { name: "进入结局事后谈" }).waitFor({ state: "visible", timeout: 5000 });
 await screenshot(desktop.page, "desktop-ending.png");
 await desktop.page.getByRole("tab", { name: "结局/历史" }).click();
 await screenshot(desktop.page, "desktop-history.png");

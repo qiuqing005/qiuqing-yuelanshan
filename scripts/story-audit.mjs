@@ -47,6 +47,90 @@ for (const [sceneId, scene] of Object.entries(SCENES)) {
   }
 }
 
+function groupedScenes(type) {
+  const groups = new Map();
+  for (const [sceneId, scene] of Object.entries(SCENES)) {
+    const group = scene.expansionGroup;
+    if (!group || group.type !== type) continue;
+    if (!groups.has(group.id)) groups.set(group.id, []);
+    groups.get(group.id).push({ sceneId, scene });
+  }
+  for (const items of groups.values()) {
+    items.sort((a, b) => a.scene.expansionGroup.index - b.scene.expansionGroup.index);
+  }
+  return groups;
+}
+
+function assertGeneratedGroups(type, expectedGroups, minLength) {
+  const groups = groupedScenes(type);
+  if (groups.size < expectedGroups) {
+    errors.push(`Expected ${expectedGroups} ${type} groups, found ${groups.size}.`);
+  }
+  for (const [groupId, items] of groups.entries()) {
+    if (items.length < minLength) errors.push(`${type} ${groupId} has ${items.length} flows, expected at least ${minLength}.`);
+    items.forEach(({ scene }, index) => {
+      const expected = index + 1;
+      if (scene.expansionGroup.index !== expected) errors.push(`${type} ${groupId} has non-sequential flow index at ${scene.expansionGroup.index}.`);
+      if (scene.expansionGroup.length < minLength) errors.push(`${type} ${groupId} declares length ${scene.expansionGroup.length}, expected at least ${minLength}.`);
+    });
+  }
+  return groups;
+}
+
+const openingGroups = assertGeneratedGroups("opening", 8, 20);
+const theaterGroups = assertGeneratedGroups("theater", 12, 40);
+const mainlineGroups = assertGeneratedGroups("mainline", 3, 80);
+
+for (const groupId of openingGroups.keys()) {
+  const entry = `${groupId}_01`;
+  if (!(SCENES.intro.choices || []).some((choice) => choice.next === entry)) {
+    errors.push(`Opening ${groupId} is not reachable from intro.`);
+  }
+}
+
+if (!SCENES.expandedMainlineHub) errors.push("Missing expandedMainlineHub.");
+for (const groupId of mainlineGroups.keys()) {
+  const entry = `${groupId}_01`;
+  if (!(SCENES.expandedMainlineHub?.choices || []).some((choice) => choice.next === entry)) {
+    errors.push(`Mainline ${groupId} is not reachable from expandedMainlineHub.`);
+  }
+}
+
+let returnToStoredCount = 0;
+let foreshadowCount = 0;
+for (const [sceneId, scene] of Object.entries(SCENES)) {
+  for (const choice of scene.choices || []) {
+    if (choice.back) errors.push(`${sceneId} still uses back:true instead of a foreshadow/theater route.`);
+    if (choice.returnToStored) returnToStoredCount += 1;
+    if (choice.foreshadow) {
+      foreshadowCount += 1;
+      if (!/^theater\d+_01$/.test(choice.next || "")) errors.push(`${sceneId} foreshadow choice does not enter a theater route.`);
+      if (!choice.returnTo || !SCENES[choice.returnTo]) errors.push(`${sceneId} foreshadow choice does not store a valid return scene.`);
+      if (/回到|退回|重新|倒回/.test(choice.label || "")) {
+        errors.push(`${sceneId} foreshadow choice still reads like a direct step-back option: ${choice.label}`);
+      }
+    }
+  }
+}
+if (returnToStoredCount < 12) errors.push(`Expected at least 12 theater return choices, found ${returnToStoredCount}.`);
+if (foreshadowCount < 12) errors.push(`Expected old back routes to become foreshadow theater entries, found ${foreshadowCount}.`);
+
+const endingScenes = Object.entries(SCENES).filter(([, scene]) => scene.ending);
+for (const [sceneId, scene] of endingScenes) {
+  const choices = scene.choices || [];
+  if (!choices.some((choice) => choice.next === "endingAftertalk")) {
+    errors.push(`${sceneId} ending does not route to endingAftertalk.`);
+  }
+  if (choices.some((choice) => choice.reset || /重新开始/.test(choice.label || ""))) {
+    errors.push(`${sceneId} ending still exposes direct restart copy.`);
+  }
+}
+if (!SCENES.endingAftertalk?.dynamicAftertalk) errors.push("Missing dynamic ending aftertalk scene.");
+if (!(SCENES.endingAftertalk?.choices || []).some((choice) => choice.reset && choice.dynamicLabel === "replayRemaining")) {
+  errors.push("Ending aftertalk does not offer replay with remaining-ending count.");
+}
+if (source.includes("重新开始")) errors.push("Source still contains forbidden ending restart copy: 重新开始.");
+
 const twelveHourRoute = [
   "sixHourWatch",
   "hourOneBorrowedFire",
