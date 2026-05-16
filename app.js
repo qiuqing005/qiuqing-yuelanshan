@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 
-const RESOURCE_VERSION = "202605162330";
+const RESOURCE_VERSION = "202605170014";
 
 const ASSETS = {
   night: "./assets/images/bg-night-road.png",
@@ -391,7 +391,26 @@ const SCENES = {
       { label: "按照票据地址前往茶铺", next: "teaMeet" },
       { label: "继续留在房间里等规则自己复原", next: "badWaitingRoom" },
       { label: "给秋清打电话，确认茶铺是否真实", next: "phoneStatic" },
-      { label: "把票据丢掉，只记住“只能表白一次”", next: "badEarly" },
+      { label: "把票据丢掉，只记住“只能表白一次”", next: "singleRuleFixation" },
+    ],
+  },
+
+  singleRuleFixation: {
+    chapter: "烧页",
+    code: "02C",
+    speaker: "手账",
+    bg: ASSETS.mirror,
+    persona: "none",
+    text: [
+      "你把茶票揉进掌心，只留下“只能表白一次”这句最醒目的规则。它确实重要，重要到足以骗你以为其他证据都可以省掉。",
+      "纸灰没有惩罚你。你还没有表白，怪谈也没有资格替你结算。可手账的空白页一下子变多了：地址、杯子、谁在场，全都被你亲手丢到了桌下。",
+      "这会让后面的选择变窄。你可以继续带着单条规则往前走，也可以先把票据从纸篓里捡回来。",
+    ],
+    effects: { flags: ["singleRuleFixation"], stats: { logic: -2, lonely: 2 } },
+    choices: [
+      { label: "把茶票捡回来，重新核对地址", next: "ashLedger", primary: true },
+      { label: "带着这句规则先给秋清打电话", next: "phoneStatic" },
+      { label: "仍只靠这一句去茶铺碰面", next: "teaMeet" },
     ],
   },
 
@@ -821,8 +840,28 @@ const SCENES = {
     effects: { stats: { like: 4, logic: 6 } },
     choices: [
       { label: "说明你要理解规则，不是利用规则", next: "yuelanOrigin" },
-      { label: "承认自己只是想赢一次怪谈", next: "badEarly" },
+      { label: "承认自己只是想赢一次怪谈", next: "badGameMindset" },
       { label: "把话题转回表白能不能被接受", next: "badAskSubstitute" },
+    ],
+  },
+
+  badGameMindset: {
+    chapter: "旧路",
+    code: "07C",
+    speaker: "月兰山",
+    bg: ASSETS.night,
+    portrait: ASSETS.yuelan,
+    persona: "yuelan",
+    text: [
+      "月兰山看了你一会儿，像在确认你说的是不是实话。",
+      "“赢？”他问，“如果你把秋清当成一道要解开的题，那你迟早会把他的沉默也当成提示。”",
+      "这句话没有把你推进结局。它只是让夜路冷了一点：你接下来能选的，不再是更快靠近，而是先把自己的目的说清楚。",
+    ],
+    effects: { flags: ["gameMindsetChecked"], stats: { logic: 3, lonely: 4 } },
+    choices: [
+      { label: "承认自己需要先理解人，再理解规则", next: "yuelanOrigin", primary: true },
+      { label: "把这份急切写进存疑页", next: "yuelanOrigin" },
+      { label: "仍想把答案从月兰山这里拿走", next: "badAskSubstitute" },
     ],
   },
 
@@ -1286,8 +1325,8 @@ const SCENES = {
     effects: { stats: { logic: 6 } },
     choices: [
       { label: "回到档案桌整理残页", next: "archiveTable" },
-      { label: "只记住“避开直接”，准备绕口表白", next: "badBothNames" },
-      { label: "只记住“避开孤独”，准备在人群里对秋清表白", next: "badQiuqingDirect" },
+      { label: "只记住“避开直接”，把话改成含混说法", next: "badRuleSort" },
+      { label: "只记住“避开孤独”，把秋清名字写进人群纸条", next: "badTogether" },
     ],
   },
 
@@ -2379,22 +2418,23 @@ const SCENES = {
   },
 
   endingJointSignature: {
-    chapter: "结局",
+    chapter: "推理偏差",
     code: "E30",
     speaker: "联名签条",
     bg: ASSETS.festival,
     portrait: ASSETS.qiuqing,
     persona: "qiuqing",
-    ending: true,
-    endingKind: "bad",
-    endingTitle: "合并签名",
-    endingSummary: "你把互认写成联名，把此刻在场的人从自己的位置上挤开。",
     text: [
       "联名签条被灯火照得很好看。两个名字靠得很近，近到你几乎能相信边界从来没有存在过。",
       "秋清把签条放回桌面，说：“如果你喜欢的是这个合起来的名字，那它不需要我回答。”",
-      "你没有说出最后一句。因为那句话忽然找不到对象，只剩一枚漂亮到失真的签名。",
+      "你没有说出最后一句。手账先一步把签条夹进伪线索页：漂亮不是证据，合并也不是互认。",
     ],
-    choices: endingChoices,
+    effects: { clues: ["falseJointSignature"], stats: { logic: 4, lonely: 2 } },
+    choices: [
+      { label: "把签条拆回三栏名册", next: "identityBoundaryAftercare", primary: true },
+      { label: "让秋清指出哪个位置被挤开", next: "identityBoundaryAftercare" },
+      { label: "仍拿联名签名开口", next: "badBothNames", confession: true },
+    ],
   },
 
   endingPaperBridgeCrowd: {
@@ -2922,18 +2962,38 @@ const SCENES = {
     choices: [{ label: "把红线重新接好，回到刚才的判断", back: true, primary: true }],
   },
   badTogether: {
-    chapter: "失败",
+    chapter: "推理偏差",
     code: "X11",
     speaker: "旁白",
     bg: ASSETS.mirror,
-    ending: true,
-    endingTitle: "同场空镜",
-    endingSummary: "你等来两只冷掉的杯子，却没有等来不可能同时出现的两个人。",
     text: [
-      "你等了一夜。两只杯子都冷了，镜子里始终只有一个位置。",
-      "第十条不会因为你的愿望让步。不能同时出现，就是不能同时出现。",
+      "你把两只杯子摆到同一条线上，镜面却只照出一只杯沿。另一只杯子不是消失了，只是没有资格证明另一个人同时在场。",
+      "这不是结局。你还没有表白，规则也还没有真正判定你。可这个误判会污染后面的选择：凡是把“互认”当成“同场”的推理，都必须先拆开。",
+      "秋清看见你停住，没有催你。他只是把其中一只杯子挪开半寸，让桌面重新出现边界。",
     ],
-    choices: endingChoices,
+    effects: { flags: ["misreadSameScene"], clues: ["falseJointSignature"], stats: { logic: 3, lonely: 2 } },
+    choices: [
+      { label: "把两只杯子分成“当下”和“承认”两栏", next: "badTogetherLedger", primary: true },
+      { label: "拿镜面裂纹重新核对第十条", next: "scenePositionAftercare" },
+      { label: "去人声处确认谁真的在场", next: "scenePositionAftercare" },
+    ],
+  },
+  badTogetherLedger: {
+    chapter: "推理偏差",
+    code: "X11A",
+    speaker: "手账",
+    bg: ASSETS.mirror,
+    text: [
+      "你在手账上画了三栏：秋清、月兰山、当下在场者。前两栏可以互相承认，第三栏却永远只能落一个名字。",
+      "联名签条被夹进伪线索页。它依旧漂亮，甚至很像一个温柔答案，但它不能替现场证明两个人同时出现。",
+      "这次修正没有把你送回上一步。它让你多了一条后续路线：之后只要遇见“同时”“一起”“你们”这样的说法，你都会先问它到底指向谁。",
+    ],
+    effects: { clues: ["nameLedger"], journals: ["j4"], stats: { logic: 7, like: 2 } },
+    choices: [
+      { label: "带着分栏名册继续核对互认", next: "identityBoundaryAftercare", primary: true },
+      { label: "把联名签条留给镜摊继续验证", next: "identityBoundaryAftercare" },
+      { label: "仍把两个名字一起说出口", next: "badBothNames", confession: true },
+    ],
   },
   badHalfTape: {
     chapter: "危险",
@@ -2995,32 +3055,38 @@ const SCENES = {
     choices: [{ label: "重新承认全部的他，回到刚才的判断", back: true, primary: true }],
   },
   badFinalRoad: {
-    chapter: "失败",
+    chapter: "场景偏差",
     code: "X15",
     speaker: "旁白",
     bg: ASSETS.night,
-    ending: true,
-    endingTitle: "无人夜路",
-    endingSummary: "你选了会让月兰山独自出现的场景，于是第七条先一步关门。",
     text: [
-      "无人夜路把人声全部关在外面。第七盏灯亮起时，秋清已经不在。",
-      "月兰山站在灯下，看着你把话说完，然后摇头。",
+      "无人夜路把人声全部关在外面。第七盏灯亮起时，秋清的脚步声被雨吞掉，只剩月兰山替他确认出口。",
+      "你还没有表白，所以第七条没有把你判成结局。它只是让你看见：如果场景继续变冷，之后能出现的选项会越来越窄。",
+      "月兰山没有收走你的机会。他把灯下的积水拨开，露出一串回到人声处的脚印。",
     ],
-    choices: endingChoices,
+    effects: { flags: ["sceneTooLonely"], fragments: ["f4b"], stats: { lonely: 8, logic: 2 } },
+    choices: [
+      { label: "沿脚印把场景重新带回人声处", next: "scenePositionAftercare", primary: true },
+      { label: "把夜路当作证词写进巡灯表", next: "scenePositionAftercare" },
+      { label: "先确认月兰山为什么独自出现", next: "scenePositionAftercare" },
+    ],
   },
   badFinalRoom: {
-    chapter: "失败",
+    chapter: "场景偏差",
     code: "X16",
     speaker: "旁白",
     bg: ASSETS.mirror,
-    ending: true,
-    endingTitle: "封闭房间",
-    endingSummary: "你把场景缩到只剩两个人，孤独便替你改变了在场者。",
     text: [
-      "封闭房间让秋清退回沉默。孤独不是浪漫布景，它会改变在场者。",
-      "你需要人声处，不是密室。",
+      "封闭房间让秋清的声音低下去。门一关，热闹不再托住他，镜面就开始替你改写在场者。",
+      "这也不是结局。错误场景只会让之后的选择变少：你若继续把密室当作温柔，最终才会在表白时被规则截断。",
+      "门缝外有人猜错灯谜，笑声很轻，却足够提醒你：今晚真正需要的是能让秋清后退的空间。",
     ],
-    choices: endingChoices,
+    effects: { flags: ["sceneTooClosed"], fragments: ["f4a"], stats: { logic: 3, like: 1, lonely: 5 } },
+    choices: [
+      { label: "把门缝打开，让人声重新进来", next: "scenePositionAftercare", primary: true },
+      { label: "把密室偏差记入镜摊裂纹", next: "scenePositionAftercare" },
+      { label: "让秋清先选择要不要离开房间", next: "scenePositionAftercare" },
+    ],
   },
   badRuleSort: {
     chapter: "推理错误",
@@ -3029,30 +3095,49 @@ const SCENES = {
     bg: ASSETS.mirror,
     text: [
       "你把拒绝范围排错了。残页发黑，像在提醒你：第七条和第八条差别极小，但足以决定生死。",
-      "重新排序前，别急着去祭灯夜。",
+      "这一次手账没有把你拖进坏结局。你还没有表白，规则只会把错误标出来，不会替你判定最后一句话。",
+      "但误读会改变后续选项：只要你分不清“表白本身被拒绝”和“对谁表白被拒绝”，祭灯夜就不会给你最稳的开口位置。",
     ],
+    effects: { flags: ["misreadRuleScope"], clues: ["archiveDraft"], stats: { logic: 4, lonely: 1 } },
     choices: [
-      { label: "把错误排序划掉，回到刚才的判断", back: true, primary: true },
-      { label: "照错误排序进入祭灯夜", next: "endingAlmostRight" },
+      { label: "把第七条和第八条分成两只木匣", next: "ruleScopeRepair", primary: true },
+      { label: "带着错误排序去祭灯夜门口核对", next: "endingAlmostRight" },
       { label: "把第七条和第八条合并成一句", next: "badBothNames", confession: true },
     ],
   },
+  ruleScopeRepair: {
+    chapter: "推理修正",
+    code: "X17A",
+    speaker: "手账",
+    bg: ASSETS.mirror,
+    text: [
+      "你把两只木匣重新贴上纸签：一只写“表白这件事”，一只写“这句话落到谁身上”。",
+      "月兰山残页放进第一只匣子，秋清残页放进第二只匣子。木盖扣住时没有巨响，只有一声很轻的确认。",
+      "这条分法不会提前告诉你最后答案。它只把能不能开口、该对谁开口、在哪里开口重新拆成三个问题。",
+    ],
+    effects: { flags: ["ruleScopeRepaired"], stats: { logic: 8, like: 1 } },
+    choices: [
+      { label: "按两只木匣继续整理残页", next: "ruleScopeAftercare", primary: true },
+      { label: "先用出口告示验证这三个问题", next: "ruleScopeAftercare" },
+    ],
+  },
   endingAlmostRight: {
-    chapter: "结局",
+    chapter: "推理偏差",
     code: "E6",
     speaker: "手账",
     bg: ASSETS.festival,
-    ending: true,
-    endingKind: "branch",
-    endingTitle: "几乎正确",
-    endingSummary: "你带着差一指宽的排序抵达祭灯夜，门缝却正好合上。",
     text: [
       "你照着错误排序走进祭灯夜。人声、灯火、秋清，全都在该在的位置。",
       "可你开口前，手账自己翻到第七条和第八条。两条规则贴得太近，近到你看不出哪一个词放错了。",
       "秋清等了很久，最后轻声说：“你是不是还没分清，这句话落在哪里？”",
-      "你几乎走到了门前。几乎，也是怪谈最喜欢的一种失败。",
+      "你几乎走到了门前。几乎不是结局，只是怪谈递来的假通行证。你若现在把它当准许并开口，才会真正失去这条路。",
     ],
-    choices: endingChoices,
+    effects: { flags: ["almostRightDoubt"], clues: ["doubtDawnReceipt"], stats: { logic: 5, like: 2 } },
+    choices: [
+      { label: "把“几乎正确”夹进存疑页", next: "ruleScopeRepair", primary: true },
+      { label: "请秋清指出句子落错的位置", next: "ruleScopeAftercare" },
+      { label: "仍把几乎正确当成准许开口", next: "badBothNames", confession: true },
+    ],
   },
   badSeparate: {
     chapter: "推理错误",
@@ -3063,41 +3148,130 @@ const SCENES = {
       "如果把他们当成毫无关系的两个人，第九条就失去意义。",
       "但如果把他们揉成一个含混的人，镜子又会立刻变黑。你需要的是边界，不是省事。",
     ],
+    effects: { flags: ["misreadIdentityBoundary"], stats: { logic: 4, lonely: 2 } },
     choices: [
-      { label: "把边界重新画清，回到刚才的判断", back: true, primary: true },
-      { label: "把两个名字彻底拆开", next: "endingTwoNames" },
-      { label: "把两个名字揉成一个", next: "endingBlurredName" },
+      { label: "把两个名字分栏登记，但保留红线", next: "identityBoundaryRepair", primary: true },
+      { label: "把两个名字彻底拆开，看看会丢失什么", next: "endingTwoNames" },
+      { label: "把两个名字揉成一个，观察镜面反应", next: "endingBlurredName" },
+    ],
+  },
+  identityBoundaryRepair: {
+    chapter: "推理修正",
+    code: "X18A",
+    speaker: "手账",
+    bg: ASSETS.mirror,
+    text: [
+      "你没有把红线剪断，只在中间系了一个很小的结。结的两边仍然分开，线却证明它们不是毫无关系。",
+      "秋清那一页和月兰山那一页被你并排夹住，中间留出“互认”两个字。这个留白不替任何人回答，只让第九条有地方落脚。",
+      "镜面没有亮，也没有黑。它像终于承认你在处理边界，而不是偷懒。",
+    ],
+    effects: { clues: ["nameLedger"], stats: { logic: 8, like: 2 } },
+    choices: [
+      { label: "带着分栏名册继续核对第九条", next: "identityBoundaryAftercare", primary: true },
+      { label: "把红线结交给镜室继续比对", next: "identityBoundaryAftercare" },
+      { label: "仍只按分开的名册向秋清开口", next: "badSplitNameConfession", confession: true },
     ],
   },
   endingTwoNames: {
-    chapter: "结局",
+    chapter: "推理偏差",
     code: "E7",
     speaker: "手账",
     bg: ASSETS.mirror,
-    ending: true,
-    endingKind: "branch",
-    endingTitle: "两本名册",
-    endingSummary: "你把他们拆成两个无关的人，于是第九条失去桥的作用。",
     text: [
       "你重新抄了一份名册：秋清一页，月兰山一页。两页纸被你分开放进不同口袋。",
       "起初这很清楚，清楚得近乎轻松。可当秋清说“他不是外人”时，你发现自己已经没有地方把这句话写进去。",
       "红线在两页纸之间断开。你保住了边界，却剪掉了能抵达结局的桥。",
     ],
-    choices: endingChoices,
+    effects: { flags: ["twoNamesLedger"], stats: { logic: 4, lonely: 3 } },
+    choices: [
+      { label: "把两页名册重新并排夹住", next: "identityBoundaryRepair", primary: true },
+      { label: "问秋清“不是外人”该写在哪里", next: "identityBoundaryAftercare" },
+      { label: "仍按两本名册只叫秋清的名字", next: "badSplitNameConfession", confession: true },
+    ],
   },
   endingBlurredName: {
-    chapter: "结局",
+    chapter: "推理偏差",
     code: "E8",
     speaker: "镜子",
     bg: ASSETS.mirror,
-    ending: true,
-    endingKind: "branch",
-    endingTitle: "含混之名",
-    endingSummary: "你省掉了边界，镜子也省掉了回答。",
     text: [
       "你把两个名字写成一个很长的合称。笔画挤在一起，像一团故意不拆开的线。",
       "镜面起了一层雾。雾里有人问你：现在在场的是谁？你张口，却只能说出那个合称。",
       "镜子于是黑下去。含混不是温柔，它只是让所有人都无法被准确看见。",
+    ],
+    effects: { flags: ["blurredNameFog"], clues: ["falseJointSignature"], stats: { logic: 3, lonely: 3 } },
+    choices: [
+      { label: "擦开雾气，把当下在场者单独写出", next: "identityBoundaryRepair", primary: true },
+      { label: "拿雾面的合称去镜摊验伪", next: "identityBoundaryAftercare" },
+      { label: "仍用那个合称把喜欢说出口", next: "badBothNames", confession: true },
+    ],
+  },
+  ruleScopeAftercare: {
+    chapter: "推理修正",
+    code: "X17B",
+    speaker: "手账",
+    bg: ASSETS.mirror,
+    text: [
+      "两只木匣被你并排放好，标签不再互相压住。第七条管的是月兰山独自在场时，表白这件事本身；第八条管的是秋清独自在场时，那句话是否落到他身上。",
+      "手账没有把这份修正判成胜利。它只把误读改成新的限制：没有分清这两层时，你无法得到最稳的开口；分清以后，你还要继续确认地点和在场者。",
+      "秋清把那张差点放错的残页推回给你，像把判断权也一起推回来。",
+    ],
+    effects: { flags: ["ruleScopeAftercare"], stats: { logic: 8, like: 2 } },
+    choices: [
+      { label: "把这次修正放进更长的取证目录", next: "expandedMainlineHub", primary: true },
+      { label: "让纸门出口小剧场继续验证这两层", next: "theater10_01", returnTo: "expandedMainlineHub" },
+      { label: "仍把两层拒绝合成一句开口", next: "badBothNames", confession: true },
+    ],
+  },
+  identityBoundaryAftercare: {
+    chapter: "推理修正",
+    code: "X18B",
+    speaker: "手账",
+    bg: ASSETS.mirror,
+    text: [
+      "你把秋清、月兰山、当下在场者分成三栏，又在中间留出“互相承认”的窄桥。桥很窄，但比剪断或揉成一团都更能承重。",
+      "这份修正不提前告诉你该怎么表白。它只拦住几种偷懒：用联名代替在场，用合称代替对象，用彻底分开代替理解。",
+      "月兰山看完后没有夸你，只把红线结推到页边。那意思很清楚：继续查，别把刚修好的边界又拿来当答案。",
+    ],
+    effects: { clues: ["nameLedger"], flags: ["identityBoundaryAftercare"], stats: { logic: 8, like: 2 } },
+    choices: [
+      { label: "把边界修正放进更长的取证目录", next: "expandedMainlineHub", primary: true },
+      { label: "让裂镜背面小剧场继续验伪", next: "theater05_01", returnTo: "expandedMainlineHub" },
+      { label: "仍用分裂后的名字向秋清开口", next: "badSplitNameConfession", confession: true },
+    ],
+  },
+  scenePositionAftercare: {
+    chapter: "场景修正",
+    code: "X16A",
+    speaker: "旁白",
+    bg: ASSETS.festival,
+    text: [
+      "你把无人夜路、封闭房间和人声处画成三张小地图。前两张不会立刻杀死选择，却会让秋清离场，让月兰山独自承担回答。",
+      "规则没有在这里结算。真正被改变的是之后的可选路径：场景越孤独，表白越容易落到错误的人格；场景越含混，名字越容易被揉成一团。",
+      "祭灯夜的人声从门缝里漏进来。它不替你表白，只证明秋清仍有后退的位置。",
+    ],
+    effects: { flags: ["scenePositionAftercare"], stats: { logic: 7, like: 2, joy: 1 } },
+    choices: [
+      { label: "把场景修正放进更长的取证目录", next: "expandedMainlineHub", primary: true },
+      { label: "让纸门出口小剧场继续排查站位", next: "theater10_01", returnTo: "expandedMainlineHub" },
+      { label: "仍在错误场景里把话说满", next: "badBothNames", confession: true },
+    ],
+  },
+  badSplitNameConfession: {
+    chapter: "失败",
+    code: "X18C",
+    speaker: "秋清",
+    bg: ASSETS.mirror,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    ending: true,
+    endingKind: "bad",
+    endingTitle: "断桥告白",
+    endingSummary: "你把边界修成隔绝，最后一句只能落到被拆开的名字上。",
+    text: [
+      "你按两本名册开口，只叫了秋清的名字。句子很清楚，清楚到月兰山被完全排除在外。",
+      "秋清听完，眼神没有变冷，却像忽然站到了很远的地方：“如果你要的只是没有那条夜路的我，那不是我。”",
+      "红线结落在桌面上，桥没有断在规则里，而是断在你替他删掉一部分自己的瞬间。",
     ],
     choices: endingChoices,
   },
@@ -3344,9 +3518,9 @@ const LARGE_EXPANSION = {
     ["theater12", "黎明回执小剧场", ASSETS.festival, "回执"],
   ],
   mainlines: [
-    ["mainline01", "旧路证词主线", "进入新增主线：旧路证词", ASSETS.night, "旧路"],
-    ["mainline02", "镜室互认主线", "进入新增主线：镜室互认", ASSETS.mirror, "镜室"],
-    ["mainline03", "祭灯留白主线", "进入新增主线：祭灯留白", ASSETS.festival, "祭灯"],
+    ["mainline01", "旧路证词主线", "沿旧路票根重查无人夜路", ASSETS.night, "旧路"],
+    ["mainline02", "镜室互认主线", "把镜室红线重新摊开", ASSETS.mirror, "镜室"],
+    ["mainline03", "祭灯留白主线", "拿祭灯朱印核对留白", ASSETS.festival, "祭灯"],
   ],
 };
 
@@ -3354,20 +3528,132 @@ function openingSceneId(id, index) {
   return `${id}_${String(index).padStart(2, "0")}`;
 }
 
+function pickGenerated(list, index) {
+  return list[(index - 1) % list.length];
+}
+
+function fillGenerated(template, { title, motif, index, total }) {
+  return template
+    .replaceAll("{title}", title)
+    .replaceAll("{motif}", motif)
+    .replaceAll("{index}", String(index))
+    .replaceAll("{total}", String(total));
+}
+
+const GENERATED_TEXT = {
+  theater: [
+    [
+      "{motif}被你压在掌心，像一张不肯立刻归档的旁证。它没有把你送回原处，反而把刚才那次犹豫拆成可以继续看的小场面。",
+      "秋清没有评价你选得对不对。他先看物件停在哪边，再看你有没有急着替它下结论。",
+      "这个小剧场的作用不是宽恕错误，而是让错误长出后续：来源、在场者、谁有权回答，都要一件一件落回桌面。",
+    ],
+    [
+      "{motif}里传来很轻的摩擦声，像有人在布幕后移动椅子。你意识到，刚才那条岔路并没有消失，只是换了一个角度等待你。",
+      "月兰山站在光外，声音比灯影更冷：“别把它演成教训。把它演成证词。”",
+      "于是你没有给自己判错，也没有急着修正。你把这件东西留在场内，看它会把谁的沉默引出来。",
+    ],
+    [
+      "小剧场的灯没有照亮全屋，只照亮{motif}边缘的一小块缺口。缺口里没有答案，却有一条可以继续追的缝。",
+      "秋清把手收在杯边，像随时可以离开，也像终于愿意留下听你把问题问完整。",
+      "你开始明白：错误选择如果只被撤销，就什么都没有留下；如果被拆开，它就会变成下一段剧情的伏笔。",
+    ],
+    [
+      "{title}没有幕布，只有一处被你忽略的停顿。停顿很窄，却足够让一句话从命令变成询问。",
+      "你把“应该”两个字划掉，换成“能不能”。秋清看见这个改动，眼神没有躲开。",
+      "场景继续往前走，但它已经不是流水账了。每一步都在确认你靠近的是人，不是攻略上的目标点。",
+    ],
+  ],
+  mainline: [
+    [
+      "{motif}把主线拽向更深的地方。你没有得到新规则，只得到更多需要互相印证的证词。",
+      "秋清问的问题很轻：“如果这条路绕远了，你还会走吗？”你没有说勇敢，只把手账翻到可以记录来源的那一页。",
+      "月兰山的批注落在页角：长线不是拖延。长线让每一次判断都知道自己从哪里来。",
+    ],
+    [
+      "这条{motif}线索没有直接指向告白。它先指向一个不舒服的问题：你到底是在等待秋清回答，还是在等待规则替他回答。",
+      "你把问题写下来，留出半行空白。空白不是故作神秘，而是给秋清保留不必立刻回应的位置。",
+      "主线因此分出新的支路：证据可以继续收，答案却不能被提前代领。",
+    ],
+    [
+      "{motif}的旧痕迹一层叠一层，像把同一句话在不同光线下重读。你越往前走，越不敢省掉上下文。",
+      "秋清偶尔补一句具体的小事：哪盏灯坏过，哪张票写错过，哪一次沉默不是拒绝而是自救。",
+      "这些细节不会替你赢得结局，但会让最后那句话不再像突然落下的判词。",
+    ],
+    [
+      "主线走到这里，{motif}不再只是地点。它变成一套检验方法：谁在场，谁能拒绝，谁的沉默不该被别人拿走。",
+      "月兰山没有催你快一点。他越安静，你越能感觉到他不是障碍，而是边界本身在说话。",
+      "你把这段判断夹进手账，准备在下一处场景里让它接受反驳。",
+    ],
+  ],
+};
+
+const GENERATED_PRIMARY_CHOICES = {
+  theater: [
+    "把{motif}放到灯下核对来源",
+    "让秋清先指出{motif}里不舒服的地方",
+    "沿{motif}留下的缺口继续追问",
+    "把这次停顿交给现场来验证",
+    "用{motif}换一个更具体的问题",
+    "把未说出口的半句拆成两份证词",
+    "让月兰山补完被省掉的前因",
+    "把{motif}旁边的沉默留给秋清",
+  ],
+  mainline: [
+    "沿{motif}继续核对下一处证词",
+    "让秋清先确认这一步愿不愿意继续",
+    "把{motif}证词拆成来源和推论",
+    "请月兰山指出这条线哪里太急",
+    "把当前判断夹进手账再往前走",
+    "先验证谁在场，再处理下一句话",
+    "把人声、地点和名字分开记录",
+    "沿{motif}留下的反证继续调查",
+  ],
+};
+
+const GENERATED_BRANCH_CHOICES = {
+  theater: [
+    "暂时藏起{motif}，观察秋清会不会主动问",
+    "把{motif}交给月兰山，让他只改一个词",
+    "不碰证物，先听场外那句笑声",
+    "换一个站位，看同一句话会不会变形",
+    "把漂亮解释夹进伪线索页",
+    "让沉默多停一拍，再决定问谁",
+  ],
+  mainline: [
+    "绕到{motif}背面查证相反说法",
+    "把这条推论暂时标成存疑",
+    "先问秋清这段记忆能不能碰",
+    "让月兰山保留反对意见",
+    "从旁人的证词切入同一处矛盾",
+    "把地点证据和感情判断分开",
+  ],
+};
+
+const GENERATED_FINAL_CHOICES = {
+  theater: [
+    "把{motif}里的伏笔留给当前现场",
+    "带着{motif}的旁证回到主线",
+    "把小场面的余波交还给当下选择",
+  ],
+  mainline: [
+    "带着{motif}证词回到茶票地址",
+    "把{motif}长线并入烧页账单",
+    "带着整理好的来源回到旧账桌",
+  ],
+};
+
 function generatedText(kind, title, motif, index, total) {
-  const step = `${index}/${total}`;
-  if (kind === "theater") {
-    return [
-      `【${title} · ${step}】你没有立刻退回原处，而是把刚才差点做出的选择夹进${motif}里。`,
-      `秋清像在旁边听一段很短的戏，偶尔提醒你：“如果它会回来，就让它带着证词回来。”`,
-      `这段小剧场不替你修正错误，只把错误留下的光影排成可复查的伏笔。`,
-    ];
-  }
-  return [
-    `【${title} · ${step}】${motif}把主线拉长一格，证词、名字和沉默都被重新摆上桌面。`,
-    `秋清问：“这一段也必须走完吗？”你回答：“不是必须，是我不想再把省略误会成勇敢。”`,
-    `月兰山的批注压在页角：长线不是拖延。长线让每一次判断都留下来源。`,
-  ];
+  return pickGenerated(GENERATED_TEXT[kind] || GENERATED_TEXT.mainline, index)
+    .map((line) => fillGenerated(line, { title, motif, index, total }));
+}
+
+function generatedChoice(kind, motif, index, branch = false) {
+  const bank = branch ? GENERATED_BRANCH_CHOICES : GENERATED_PRIMARY_CHOICES;
+  return fillGenerated(pickGenerated(bank[kind] || bank.mainline, index), { title: "", motif, index, total: 0 });
+}
+
+function generatedFinalChoice(kind, motif, index) {
+  return fillGenerated(pickGenerated(GENERATED_FINAL_CHOICES[kind] || GENERATED_FINAL_CHOICES.mainline, index), { title: "", motif, index, total: 0 });
 }
 
 function addOpeningScene(profile, index, { speaker = "旁白", persona = "none", portrait = "", text, choices, effects }) {
@@ -3611,10 +3897,53 @@ function addBranchingOpening(profile) {
   });
 }
 
-function addLinearSequence({ id, type, title, bg, motif, length, finalChoice, finalNext, returnToStored = false }) {
+function generatedSequenceChoice(id, type, motif, index, length, finalChoice, finalNext, returnToStored) {
+  if (index === length) {
+    const label = finalChoice || generatedFinalChoice(type, motif, index);
+    return returnToStored
+      ? [{ label, returnToStored: true, primary: true }]
+      : [{ label, next: finalNext, primary: true }];
+  }
+
+  const nextId = `${id}_${String(index + 1).padStart(2, "0")}`;
+  const choices = [{
+    label: generatedChoice(type, motif, index),
+    next: nextId,
+    primary: true,
+    effects: { flags: [`${id}Step${String(index).padStart(2, "0")}`], stats: { logic: 1, like: type === "mainline" ? 1 : 0 } },
+  }];
+
+  const branchTarget = Math.min(length, index + (index % 3 === 0 ? 3 : 2));
+  if (branchTarget > index + 1) {
+    choices.push({
+      label: generatedChoice(type, motif, index, true),
+      next: `${id}_${String(branchTarget).padStart(2, "0")}`,
+      effects: {
+        flags: [`${id}Branch${String(index).padStart(2, "0")}`],
+        stats: { logic: type === "mainline" ? 2 : 1, like: index % 2 === 0 ? 1 : 0, lonely: index % 5 === 0 ? 1 : 0 },
+      },
+    });
+  }
+
+  if (index % 10 === 0 && index + 1 < length) {
+    choices.push({
+      label: type === "theater"
+        ? `把${motif}里那句太顺的话标成伪线索`
+        : `把${motif}里还不能确认的部分夹进存疑页`,
+      next: nextId,
+      effects: {
+        clues: [type === "theater" ? "falseJointSignature" : "doubtDawnReceipt"],
+        stats: { logic: 2 },
+      },
+    });
+  }
+
+  return choices;
+}
+
+function addBraidedSequence({ id, type, title, bg, motif, length, finalChoice, finalNext, returnToStored = false }) {
   for (let index = 1; index <= length; index += 1) {
     const sceneId = `${id}_${String(index).padStart(2, "0")}`;
-    const nextId = `${id}_${String(index + 1).padStart(2, "0")}`;
     const final = index === length;
     SCENES[sceneId] = {
       chapter: type === "opening" ? "新增开局" : type === "theater" ? "小剧场" : "新增主线",
@@ -3623,14 +3952,12 @@ function addLinearSequence({ id, type, title, bg, motif, length, finalChoice, fi
       bg,
       portrait: index % 3 === 0 ? ASSETS.yuelan : index % 2 === 0 ? ASSETS.qiuqing : "",
       persona: index % 3 === 0 ? "yuelan" : index % 2 === 0 ? "qiuqing" : "none",
-      expansionGroup: { type, id, index, length },
+      expansionGroup: { type, id, index, length, branched: true },
       text: generatedText(type, title, motif, index, length),
-      effects: final ? { flags: [`${id}Complete`], stats: { logic: 1, like: type === "theater" ? 0 : 1 } } : { stats: { logic: 1 } },
-      choices: final
-        ? [returnToStored
-          ? { label: finalChoice, returnToStored: true, primary: true }
-          : { label: finalChoice, next: finalNext, primary: true }]
-        : [{ label: `继续${title}第 ${index + 1} 段`, next: nextId, primary: true }],
+      effects: final
+        ? { flags: [`${id}Complete`], stats: { logic: 2, like: type === "theater" ? 1 : 2 } }
+        : { stats: { logic: 1 } },
+      choices: generatedSequenceChoice(id, type, motif, index, length, finalChoice, finalNext, returnToStored),
     };
   }
 }
@@ -3696,27 +4023,27 @@ function installLargeExpansionContent() {
     SCENES.ashPuzzle.choices.push({ label: "翻开三条新增主线目录", next: "expandedMainlineHub" });
   }
   LARGE_EXPANSION.mainlines.forEach(([id, title, , bg, motif]) => {
-    addLinearSequence({
+    addBraidedSequence({
       id,
       type: "mainline",
       title,
       bg,
       motif,
       length: 80,
-      finalChoice: "把这条长线并回茶票地址",
+      finalChoice: `带着${motif}证词回到茶票地址`,
       finalNext: "ashLedger",
     });
   });
 
   LARGE_EXPANSION.theaters.forEach(([id, title, bg, motif]) => {
-    addLinearSequence({
+    addBraidedSequence({
       id,
       type: "theater",
       title,
       bg,
       motif,
       length: 40,
-      finalChoice: "把这段小剧场作为伏笔带回主线",
+      finalChoice: `把${motif}里的伏笔留给当前现场`,
       returnToStored: true,
     });
   });

@@ -81,6 +81,27 @@ const openingGroups = assertGeneratedGroups("opening", 8, 20);
 const theaterGroups = assertGeneratedGroups("theater", 12, 40);
 const mainlineGroups = assertGeneratedGroups("mainline", 3, 80);
 
+function generatedSystemLabel(label) {
+  return /^继续.+第 \d+ 段$/.test(label) ||
+    /把这条长线|把这段小剧场|进入新增主线|新增主线：|作为伏笔带回主线/.test(label);
+}
+
+function assertGeneratedBranching(type, groups, minBranchScenes) {
+  for (const [groupId, items] of groups.entries()) {
+    const systemLabels = items.flatMap(({ sceneId, scene }) =>
+      (scene.choices || [])
+        .filter((choice) => generatedSystemLabel(choice.label || ""))
+        .map((choice) => `${sceneId}: ${choice.label}`)
+    );
+    if (systemLabels.length) errors.push(`${type} ${groupId} still has system-like generated choices:\n${systemLabels.join("\n")}`);
+    const branchScenes = items.filter(({ scene }) => (scene.choices || []).length >= 2);
+    if (branchScenes.length < minBranchScenes) errors.push(`${type} ${groupId} has only ${branchScenes.length} branching nodes.`);
+  }
+}
+
+assertGeneratedBranching("theater", theaterGroups, 24);
+assertGeneratedBranching("mainline", mainlineGroups, 48);
+
 let openingEchoChoiceCount = 0;
 for (const groupId of openingGroups.keys()) {
   const entry = `${groupId}_01`;
@@ -94,7 +115,7 @@ for (const groupId of openingGroups.keys()) {
   if (branchScenes.length < 6) errors.push(`Opening ${groupId} has only ${branchScenes.length} branching nodes.`);
   const linearLabels = items.flatMap(({ sceneId, scene }) =>
     (scene.choices || [])
-      .filter((choice) => /^继续.+第 \d+ 段$/.test(choice.label || ""))
+      .filter((choice) => generatedSystemLabel(choice.label || ""))
       .map((choice) => `${sceneId}: ${choice.label}`)
   );
   if (linearLabels.length) errors.push(`Opening ${groupId} still has linear filler choices:\n${linearLabels.join("\n")}`);
@@ -121,6 +142,9 @@ for (const groupId of mainlineGroups.keys()) {
     errors.push(`Mainline ${groupId} is not reachable from expandedMainlineHub.`);
   }
 }
+(SCENES.expandedMainlineHub?.choices || []).forEach((choice) => {
+  if (generatedSystemLabel(choice.label || "")) errors.push(`expandedMainlineHub exposes a system-like entry choice: ${choice.label}`);
+});
 
 let returnToStoredCount = 0;
 let foreshadowCount = 0;
@@ -142,6 +166,37 @@ if (returnToStoredCount < 12) errors.push(`Expected at least 12 theater return c
 if (foreshadowCount < 12) errors.push(`Expected old back routes to become foreshadow theater entries, found ${foreshadowCount}.`);
 
 const endingScenes = Object.entries(SCENES).filter(([, scene]) => scene.ending);
+const ruleJudgmentEndingIds = new Set([
+  "badEarly",
+  "badQiuqingDirect",
+  "badYuelanDirect",
+  "badBothNames",
+  "badFinalMissing",
+  "badWrittenConfession",
+  "endingBorrowedFlame",
+  "endingBorrowedBlessings",
+  "endingWarmShortcut",
+  "endingTeaWitness",
+  "endingFestivalShortcut",
+  "endingBlankAnswer",
+]);
+const ruleEndingPattern = /规则|第七条|第八条|第九条|排序|拒绝范围|许可|合并|同时|同场|几乎正确|两本名册|含混之名/;
+for (const [sceneId, scene] of Object.entries(SCENES)) {
+  for (const choice of scene.choices || []) {
+    if (!choice.next) continue;
+    const target = SCENES[choice.next];
+    if (!target?.ending) continue;
+    const targetCopy = [
+      target.chapter,
+      target.endingTitle,
+      target.endingSummary,
+      choice.label,
+    ].join("");
+    if ((ruleJudgmentEndingIds.has(choice.next) || ruleEndingPattern.test(targetCopy)) && !choice.confession) {
+      errors.push(`${sceneId} "${choice.label}" reaches rule-related ending ${choice.next} without confession:true.`);
+    }
+  }
+}
 for (const [sceneId, scene] of endingScenes) {
   const choices = scene.choices || [];
   if (!choices.some((choice) => choice.next === "endingAftertalk")) {

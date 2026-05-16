@@ -56,14 +56,19 @@ async function clickChoiceStartingWith(page, prefix) {
 
 async function drainGeneratedFlow(page) {
   for (let guard = 0; guard < 100; guard += 1) {
-    const label = await page.evaluate(() => {
-      const labels = Array.from(document.querySelectorAll(".choice")).map((button) => button.textContent?.trim() || "");
-      return labels.find((text) => /^继续.+第 \d+ 段$/.test(text)) ||
-        labels.find((text) => text === "把这段小剧场作为伏笔带回主线") ||
-        labels.find((text) => text === "带着这段开局翻检烧毁的信封") ||
-        labels.find((text) => text === "把这条长线并回茶票地址") ||
-        "";
+    const state = await page.evaluate(() => {
+      const code = document.querySelector("#sceneCode")?.textContent?.trim() || "";
+      const labels = Array.from(document.querySelectorAll(".choice"))
+        .map((button) => button.textContent?.trim() || "")
+        .filter(Boolean);
+      return { code, labels };
     });
+    const inGeneratedRoute = /^(THEATER|MAINLINE)\d+-/.test(state.code);
+    const legacyFiller = state.labels.find((text) => /^继续.+第 \d+ 段$/.test(text) ||
+      text === "把这段小剧场作为伏笔带回主线" ||
+      text === "把这条长线并回茶票地址");
+    if (legacyFiller) throw new Error(`Generated flow still exposes filler choice: ${legacyFiller}`);
+    const label = inGeneratedRoute ? state.labels[0] : "";
     if (!label) return;
     await click(page, label);
   }
