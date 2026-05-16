@@ -15,6 +15,10 @@ const audit = spawnSync(process.execPath, ["scripts/text-audit.mjs"], { stdio: "
 if (audit.status !== 0) {
   throw new Error("Text audit failed.");
 }
+const storyAudit = spawnSync(process.execPath, ["scripts/story-audit.mjs"], { stdio: "inherit" });
+if (storyAudit.status !== 0) {
+  throw new Error("Story audit failed.");
+}
 
 const browser = await chromium.launch({ headless: true });
 const errors = [];
@@ -38,6 +42,23 @@ async function click(page, label) {
     { timeout: 5000 }
   ).catch(() => {});
   await page.waitForTimeout(80);
+  await assertNoChoiceRiskHints(page);
+}
+
+async function assertNoChoiceRiskHints(page) {
+  const offenders = await page.evaluate(() =>
+    Array.from(document.querySelectorAll(".choice")).flatMap((button) => {
+      const text = button.textContent || "";
+      const attrs = ["data-risk-label", "data-error-tag", "data-mistake-tag"]
+        .map((name) => button.getAttribute(name))
+        .filter(Boolean);
+      const hinted = /风险|危险选项|错误选项|失败选项|坏结局|risk|danger/i.test(text);
+      return hinted || attrs.length ? [`${text}${attrs.length ? ` (${attrs.join(",")})` : ""}`] : [];
+    })
+  );
+  if (offenders.length) {
+    throw new Error(`Choice risk hints should not be visible to players:\n${offenders.join("\n")}`);
+  }
 }
 
 async function waitForImages(page) {
@@ -155,6 +176,7 @@ await earlyEnding.context.close();
 const desktop = await newPage(1366, 900);
 await desktop.page.goto(baseUrl, { waitUntil: "networkidle" });
 await assertVersionedFrontendAssets(desktop.page);
+await assertNoChoiceRiskHints(desktop.page);
 await desktop.page.getByRole("button", { name: "启用或关闭声音" }).click();
 await desktop.page.waitForTimeout(200);
 await screenshot(desktop.page, "desktop-start.png");
@@ -217,12 +239,19 @@ const route = [
   "从第一盏灯开始巡夜",
   "盖下第一格“借火”",
   "去热茶摊完成第二小时",
-  "沿着人群边缘去看旧路灯影",
+  "核对茶摊账单上的三道水圈",
+  "把空白栏留给秋清自己",
   "只把旧路当证词，不回应暗处人声",
   "按在场者整理票根和杯子",
   "去镜摊完成第五小时",
   "把裂纹记下来，不要求它合上",
   "把六格巡灯表收进手账",
+  "把风吹乱的页码按发生顺序夹回去",
+  "把两个名字分栏登记，不合成签名",
+  "只让纸桥承重证据，不承重回答",
+  "站在人声能托住但不能替声的位置",
+  "把沉默留给秋清，不交给月兰山保管",
+  "把十二枚朱印并排留在手账里",
   "站回秋清能听见也能后退的位置",
   "月兰山，我爱你。",
 ];

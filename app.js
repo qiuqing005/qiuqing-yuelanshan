@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 
-const RESOURCE_VERSION = "202605161230";
+const RESOURCE_VERSION = "202605161700";
 
 const ASSETS = {
   night: "./assets/images/bg-night-road.png",
@@ -72,6 +72,11 @@ const CLUES = {
     img: ASSETS.cup,
     body: "秋清在有人声、有热茶、有笑声的地方更稳定。快乐不是钥匙，但能把他留在场内。",
   },
+  teaLedger: {
+    title: "茶摊账单",
+    img: ASSETS.cup,
+    body: "账单上有三道水圈：一只杯子被使用，一只杯子被空着，一栏回答必须留白。旁人能证明你们来过，不能证明秋清答应过。",
+  },
   road: {
     title: "第七盏路灯",
     img: ASSETS.moon,
@@ -137,6 +142,55 @@ const CLUES = {
     img: ASSETS.moon,
     body: "裂镜没有照出两个人同时站在一起。它只照出一个人身上轮流亮起的两种边界：谁在场，谁就拥有当下的拒绝权。",
   },
+  archiveDraft: {
+    title: "档案摊散页",
+    img: ASSETS.rulebook,
+    body: "后半夜的散页没有给出新规则，只把已经见过的证词重新摊开。顺序一乱，答案就会看起来比证据更像证据。",
+  },
+  falseJointSignature: {
+    no: "N8",
+    title: "联名签条",
+    img: ASSETS.thread,
+    kind: "fake",
+    body: "纸条把秋清和月兰山写成一枚联名签名，看起来省事，却把“互认”误写成“同场”。它能安慰你，不能证明任何人此刻在场。",
+  },
+  nameLedger: {
+    no: "N8",
+    title: "分栏名册",
+    img: ASSETS.rulebook,
+    replaces: ["falseJointSignature"],
+    body: "名册把秋清、月兰山与“当下在场者”分成三栏。互相承认不等于共同署名，分栏才让最后一句话有落点。",
+  },
+  paperBridge: {
+    title: "纸桥检尺",
+    img: ASSETS.moon,
+    body: "纸桥只能承重证据：杯子、票根、残页、朱印。它不能承重回答，也不能把一句话从你手里搬到人群嘴里。",
+  },
+  wrongCrowdProof: {
+    no: "D10",
+    title: "人群证明",
+    img: ASSETS.thread,
+    kind: "fake",
+    body: "人群越齐，证明越像完整。可它只能证明热闹仍在，不能证明秋清不会离开，也不能证明他愿意接住你的句子。",
+  },
+  crowdDistance: {
+    no: "D10",
+    title: "半步距离",
+    img: ASSETS.thread,
+    replaces: ["wrongCrowdProof"],
+    body: "最稳的位置不是最近的位置，而是秋清能听清、也能后退的位置。人声托住场景，半步距离托住选择。",
+  },
+  borrowedSilence: {
+    title: "借来的沉默",
+    img: ASSETS.moon,
+    body: "沉默也有主人。你可以暂时不说话，但不能把不说话交给月兰山保管；那会让沉默变成另一种替你决定。",
+  },
+  doubtDawnReceipt: {
+    title: "黎明回执",
+    img: ASSETS.cup,
+    kind: "doubt",
+    body: "回执上只写着：天亮前你没有逃走。它值得留下，也必须存疑；坚持到黎明不等于得到回答。",
+  },
 };
 
 const JOURNALS = {
@@ -200,6 +254,10 @@ const JOURNALS = {
     title: "手账十四：回温不是奖赏",
     body: "秋清在热茶摊前笑了一下，你几乎想把这当成准许。可快乐只是让他留在场内，不是让你提前索取答案。你在杯沿停住，才没有把温暖误认成通行证。",
   },
+  j19: {
+    title: "手账十九：旁证的边界",
+    body: "老板娘可以记得秋清喝过茶，记得你们在同一张桌边停了很久。可她不能替秋清证明一句还没有发生的话。旁证只能证明场景，不能证明回答。",
+  },
   j15: {
     title: "手账十五：旧路在场外",
     body: "祭灯夜也能看见那条夜路。它在场外亮着，不再把你拖回无人处。你终于明白，危险并没有消失，只是你学会了不把危险当成浪漫的证明。",
@@ -215,6 +273,30 @@ const JOURNALS = {
   j18: {
     title: "手账十八：留白",
     body: "最后一小时最难的不是说出口，而是不预演对方的回答。你把答案的位置留空，才把秋清从怪谈的机关里还给他自己。",
+  },
+  j20: {
+    title: "手账二十：后六时",
+    body: "六格巡灯表收进手账后，夜并没有立刻结束。你以为自己已经准备好，祭灯却把准备拆成更细的十二段：不是增加规则，而是确认你不会把规则当成捷径。",
+  },
+  j21: {
+    title: "手账二十一：分栏",
+    body: "最诱人的假线索常常很整齐。联名签条把两个名字合成一个漂亮结果，分栏名册却提醒你：越到最后，越不能为了省事把边界写没。",
+  },
+  j22: {
+    title: "手账二十二：纸桥",
+    body: "纸桥承得住证据，承不住愿望。你把票根、残页和朱印放上去，它没有塌；你一想到让人群替你递话，纸边就开始发软。",
+  },
+  j23: {
+    title: "手账二十三：半步",
+    body: "你终于能把距离看成礼貌，而不是胆怯。秋清能听见你，也能离开你；这半步让告白不再像围堵。",
+  },
+  j24: {
+    title: "手账二十四：沉默的主人",
+    body: "不说话并不天然正确。你可以把话暂时收住，但不能把沉默借给月兰山。借出去的沉默，会替你变成一个没有出口的结论。",
+  },
+  j25: {
+    title: "手账二十五：黎明不作证",
+    body: "天亮只是说明你撑到了天亮，不说明秋清已经回答。你把黎明回执夹进存疑页，才没有把坚持误写成许可。",
   },
 };
 
@@ -1494,8 +1576,46 @@ const SCENES = {
     ],
     effects: { flags: ["hourWarmthChecked"], journals: ["j14"], stats: { joy: 10, logic: 5, like: 5 } },
     choices: [
-      { label: "沿着人群边缘去看旧路灯影", next: "hourThreeRoadEdge", primary: true },
+      { label: "核对茶摊账单上的三道水圈", next: "hourTwoCupLedger", primary: true },
       { label: "趁他笑时把话说出来", next: "badWarmShortcut", danger: true, confession: true },
+    ],
+  },
+
+  hourTwoCupLedger: {
+    chapter: "六时巡灯",
+    code: "23C-2B",
+    speaker: "茶摊账单",
+    bg: ASSETS.tea,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "老板娘把账单压在杯底，纸面被热气烘得微微卷起。上面有三道水圈：一深、一浅、一处没有落下。",
+      "深的那道圈在秋清杯下。浅的那道圈在你面前。空着的地方旁边写着两个小字：回答。",
+      "秋清看见那两个字，手指停在杯沿，没有替你把账单转向任何人。",
+      "你把空栏留下，只在账单背面写：今晚有人声，有热茶，秋清在场。",
+    ],
+    effects: { flags: ["hourTeaLedgerChecked"], clues: ["teaLedger"], journals: ["j19"], stats: { logic: 7, like: 3 } },
+    choices: [
+      { label: "把空白栏留给秋清自己", next: "hourThreeRoadEdge", primary: true, requires: ["hourTeaLedgerChecked"] },
+      { label: "请老板娘替你证明秋清已经答应", next: "badTeaWitness", danger: true },
+    ],
+  },
+
+  badTeaWitness: {
+    chapter: "歧路",
+    code: "W8A",
+    speaker: "茶摊账单",
+    bg: ASSETS.tea,
+    portrait: ASSETS.qiuqing,
+    persona: "unstable",
+    text: [
+      "你把账单推给老板娘，问她能不能替你盖个章，证明秋清刚才没有拒绝。",
+      "老板娘的手悬在印泥上方，迟迟没有落下。她只是看见两个人喝过茶，没有看见一颗心被交出去，也没有看见另一颗心答复。",
+      "秋清低头吹开杯面热气。那口气很轻，却把你从旁人的见证里吹回桌边。",
+    ],
+    choices: [
+      { label: "把账单收回，留住空栏", back: true, primary: true },
+      { label: "坚持让旁人证明这就是准许", next: "endingTeaWitness", confession: true },
     ],
   },
 
@@ -1661,7 +1781,7 @@ const SCENES = {
     ],
     effects: { flags: ["sixHourWatchComplete"], journals: ["j18"], stats: { logic: 10, like: 6, joy: 4 } },
     choices: [
-      { label: "把六格巡灯表收进手账", next: "festivalMark", primary: true, requires: ["sixHourWatchComplete"] },
+      { label: "把六格巡灯表收进手账", next: "hourSevenArchiveWind", primary: true, requires: ["sixHourWatchComplete"] },
       { label: "在留白格里先写下“他会同意”", next: "badBlankAnswer", danger: true },
       { label: "在留白格里先写下“他会拒绝”", next: "badBlankRefusal", danger: true },
     ],
@@ -1736,6 +1856,235 @@ const SCENES = {
     choices: [
       { label: "擦掉拒绝，把留白还给现场", back: true, primary: true },
       { label: "带着预设的拒绝闭口离开", next: "endingBlankRefusal" },
+    ],
+  },
+
+  hourSevenArchiveWind: {
+    chapter: "十二时守灯",
+    code: "23D-7",
+    speaker: "档案摊",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "第七小时，祭灯夜的风从档案摊后面吹来，把刚收好的六格巡灯表掀开。",
+      "摊主没有伸手拦，只把一只镇纸推到你面前。镇纸下面压着散页：茶摊账单、旧路票根、裂镜拓印、没有署名的收据。",
+      "秋清帮你按住最上面那张，却没有替你排序。纸页乱得像一个答案正在假装自己早就存在。",
+      "你把镇纸压在页角，先按发生顺序整理，而不是按哪一页最像结论整理。",
+    ],
+    effects: { flags: ["twelveHourWatchStarted"], clues: ["archiveDraft"], journals: ["j20"], stats: { logic: 8, like: 3 } },
+    choices: [
+      { label: "把风吹乱的页码按发生顺序夹回去", next: "hourEightNameLedger", primary: true, requires: ["twelveHourWatchStarted"] },
+      { label: "只留下最像结论的那一页", next: "badArchiveShortcut", danger: true, mistakeTag: "evidence-shortcut" },
+    ],
+  },
+
+  badArchiveShortcut: {
+    chapter: "歧路",
+    code: "W16",
+    speaker: "档案摊",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "unstable",
+    text: [
+      "你抽出最像结论的那一页。它写得太完整，完整到不需要秋清在场，也不需要你继续确认。",
+      "风立刻停了。停得很假，像怪谈终于等到你愿意用一张纸替整夜收尾。",
+      "秋清松开手，散页从他指尖滑下去。你看见自己并没有变勇敢，只是把剩下的时间折进了纸缝。",
+    ],
+    choices: [
+      { label: "把那页放回去，重新整理散页", back: true, primary: true },
+      { label: "带着单页走向最后的灯", next: "endingArchiveShortcut" },
+    ],
+  },
+
+  hourEightNameLedger: {
+    chapter: "十二时守灯",
+    code: "23D-8",
+    speaker: "分栏名册",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "第八小时，旧账桌换成一册薄名册。左栏写着“秋清”，右栏写着“月兰山”，中间还有一栏空着：当下在场者。",
+      "空栏不是要你二选一。它只是提醒你：同一个身体里的互认，不能被写成同一时间的联名。",
+      "秋清看着那册名册，忽然很轻地说：“这次不要替我把名字省掉。”",
+      "你把两个名字分栏登记，又在中间写下：此刻，秋清在场。",
+    ],
+    effects: { flags: ["nameLedgerSplit"], clues: ["nameLedger"], journals: ["j21"], stats: { logic: 8, like: 5 } },
+    choices: [
+      { label: "把两个名字分栏登记，不合成签名", next: "hourNinePaperBridge", primary: true, requires: ["nameLedgerSplit"] },
+      { label: "把两栏合成一个联名签名", next: "badJointSignature", danger: true, mistakeTag: "merged-presence" },
+    ],
+  },
+
+  badJointSignature: {
+    chapter: "歧路",
+    code: "W17",
+    speaker: "联名签条",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "unstable",
+    text: [
+      "你把两栏线条拉到一起，写成一枚漂亮的联名签名。",
+      "笔画刚合上，名册就显得轻松很多。轻松到像已经替你把最难分清的部分全部省掉。",
+      "秋清的指尖停在纸边。他没有把纸撕掉，只是问：“如果这样也算我在场，那我是不是可以不用在这里？”",
+    ],
+    effects: { clues: ["falseJointSignature"], stats: { logic: 3, lonely: 8 } },
+    choices: [
+      { label: "划掉联名，回到分栏名册", back: true, primary: true },
+      { label: "保留联名签条作为证明", next: "endingJointSignature" },
+    ],
+  },
+
+  hourNinePaperBridge: {
+    chapter: "十二时守灯",
+    code: "23D-9",
+    speaker: "纸桥",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "第九小时，摊主把三张薄纸折成一座小桥。桥下放着茶杯、票根和残页，桥面只容得下一枚朱印。",
+      "题目写在桥脚：证据能过桥，回答不能过桥。",
+      "你把杯子、票根、残页依次放上去。纸桥微微下沉，却没有塌。",
+      "轮到那句尚未说出口的话时，你把手收回来。它不能让纸替你走到秋清面前。",
+    ],
+    effects: { flags: ["paperBridgeMeasured"], clues: ["paperBridge"], journals: ["j22"], stats: { logic: 8, like: 4 } },
+    choices: [
+      { label: "只让纸桥承重证据，不承重回答", next: "hourTenCrowdDistance", primary: true, requires: ["paperBridgeMeasured"] },
+      { label: "让人群从纸桥上替你递话", next: "badPaperBridgeCrowd", danger: true, confession: true, mistakeTag: "delegated-confession" },
+    ],
+  },
+
+  badPaperBridgeCrowd: {
+    chapter: "歧路",
+    code: "W18",
+    speaker: "纸桥",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "unstable",
+    text: [
+      "你把尚未说出口的话写成纸条，推上桥面。",
+      "纸桥没有立刻塌。它只是把纸条送到人群那一侧，让许多声音同时读出你还没有亲口承担的句子。",
+      "秋清听见了，却没有看向你。因为那句话已经从太多嘴里出来，反而找不到真正的来源。",
+    ],
+    choices: [
+      { label: "收回纸条，回到桥的这一侧", back: true, primary: true },
+      { label: "让人群继续读完", next: "endingPaperBridgeCrowd" },
+    ],
+  },
+
+  hourTenCrowdDistance: {
+    chapter: "十二时守灯",
+    code: "23D-10",
+    speaker: "人群边线",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "第十小时，人群忽然变得密了。有人递灯，有人递糖，有人问你们是不是也在等谜底。",
+      "秋清被热闹推近半步，又自己退回半步。那不是拒绝，只是在给呼吸留下位置。",
+      "你跟着退回去，站在他能听清、也能转身的位置。人声在你们身后垫住场景，却没有越过你们之间那条边线。",
+    ],
+    effects: { flags: ["crowdDistanceChecked"], clues: ["crowdDistance"], journals: ["j23"], stats: { logic: 7, like: 6, joy: 4 } },
+    choices: [
+      { label: "站在人声能托住但不能替声的位置", next: "hourElevenBorrowedSilence", primary: true, requires: ["crowdDistanceChecked"] },
+      { label: "请人群齐声证明秋清不会离开", next: "badCrowdProof", danger: true, mistakeTag: "crowd-proof" },
+    ],
+  },
+
+  badCrowdProof: {
+    chapter: "歧路",
+    code: "W19",
+    speaker: "人群边线",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "unstable",
+    text: [
+      "你向人群借来一句整齐的证明。许多人一起说：他还在这里。",
+      "这句话听起来温暖，也听起来可靠。可秋清被这份整齐推得更远，因为它把“还在”说成了“不许走”。",
+      "你把那句证明记下，又立刻在旁边打了一个问号。它像线索，也像陷阱。",
+    ],
+    effects: { clues: ["wrongCrowdProof"], stats: { lonely: 8, logic: 4 } },
+    choices: [
+      { label: "把人群证明夹进存疑页，退回半步", back: true, primary: true },
+      { label: "要求人群再证明一次", next: "endingCrowdProof" },
+    ],
+  },
+
+  hourElevenBorrowedSilence: {
+    chapter: "十二时守灯",
+    code: "23D-11",
+    speaker: "无声灯",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "第十一小时，摊位之间的灯忽然暗了一圈。不是熄灭，只是把喧闹压低，像给你们留出一段没有掌声的路。",
+      "月兰山的名字在你心里浮了一下。你知道他能保管许多东西：恐慌、推理、回家的路。",
+      "可这一次，沉默不能交给他。你只是陪秋清站着，让不说话仍然属于此刻的你和此刻的他。",
+    ],
+    effects: { flags: ["silenceKeptHere"], clues: ["borrowedSilence"], journals: ["j24"], stats: { logic: 8, like: 5 } },
+    choices: [
+      { label: "把沉默留给秋清，不交给月兰山保管", next: "hourTwelveDawnMark", primary: true, requires: ["silenceKeptHere"] },
+      { label: "让月兰山替你沉默到天亮", next: "badBorrowedSilence", danger: true, mistakeTag: "outsourced-silence" },
+    ],
+  },
+
+  badBorrowedSilence: {
+    chapter: "歧路",
+    code: "W20",
+    speaker: "无声灯",
+    bg: ASSETS.festival,
+    portrait: ASSETS.yuelan,
+    persona: "yuelan",
+    text: [
+      "你在心里请月兰山替你保管沉默。灯火立刻冷静下来，冷静得几乎令人安心。",
+      "月兰山出现时没有责备你。他只是站在秋清原本的位置上，说：“我可以让你不说，但我不能让他回答。”",
+      "这句话太准确，准确到你终于听见：借来的沉默和借来的告白一样，都会让真正该在场的人退开。",
+    ],
+    choices: [
+      { label: "收回沉默，等秋清回到灯下", back: true, primary: true },
+      { label: "让冷静替你结束这一夜", next: "endingBorrowedSilence" },
+    ],
+  },
+
+  hourTwelveDawnMark: {
+    chapter: "十二时守灯",
+    code: "23D-12",
+    speaker: "黎明回执",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "第十二小时，纸灯的红边开始发白。摊主递来最后一枚朱印，印面上没有字，只有一道很细的晨光。",
+      "回执写着：天亮前，你没有逃走。",
+      "你把它夹进存疑页。坚持到这里值得记录，但它不能替秋清回答，也不能替你索取一个确定的结局。",
+      "十二枚朱印并排落下时，手账变得很重。重得像终于能承认：最后一句话仍然只是一句话，不是对方必须接住的债。",
+    ],
+    effects: { flags: ["twelveHourWatchComplete"], clues: ["doubtDawnReceipt"], journals: ["j25"], stats: { logic: 10, like: 6, joy: 5 } },
+    choices: [
+      { label: "把十二枚朱印并排留在手账里", next: "festivalMark", primary: true, requires: ["twelveHourWatchComplete"] },
+      { label: "拿黎明回执要求一个确定回答", next: "badDawnReceipt", danger: true, confession: true, mistakeTag: "earned-answer" },
+    ],
+  },
+
+  badDawnReceipt: {
+    chapter: "歧路",
+    code: "W21",
+    speaker: "黎明回执",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "unstable",
+    text: [
+      "你把黎明回执举到秋清面前，像举起一整夜的证明。",
+      "秋清看了很久，轻声说：“你很努力。”",
+      "这句话没有错。也正因为没有错，它不能被你拿来交换回答。努力属于你，回答仍然属于他。",
+    ],
+    effects: { clues: ["doubtDawnReceipt"], stats: { lonely: 8, logic: 5 } },
+    choices: [
+      { label: "把回执夹回存疑页", back: true, primary: true },
+      { label: "继续用黎明换回答", next: "endingDawnReceipt" },
     ],
   },
 
@@ -1857,6 +2206,25 @@ const SCENES = {
     choices: endingChoices,
   },
 
+  endingTeaWitness: {
+    chapter: "结局",
+    code: "E22A",
+    speaker: "茶摊账单",
+    bg: ASSETS.tea,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    ending: true,
+    endingKind: "bad",
+    endingTitle: "旁证越界",
+    endingSummary: "你让旁人证明尚未发生的回答，秋清被推出自己的选择。",
+    text: [
+      "印章终于落下。红色圆痕盖在空白栏上，像一只太早闭上的眼睛。",
+      "秋清没有生气。他只是把账单转回你面前，让你看见那枚印章下面什么都没有。",
+      "旁人证明你们同桌，证明茶还热，证明他笑过一次。可你让这些证明越过边界，替他回答了还没被问完的问题。",
+    ],
+    choices: endingChoices,
+  },
+
   endingRoadEcho: {
     chapter: "结局",
     code: "E23",
@@ -1967,6 +2335,121 @@ const SCENES = {
       "你带着“他会拒绝”的预设离开。这样当然不会被真正拒绝，因为你没有把真正的问题交出去。",
       "身后的祭灯夜仍然热闹，秋清仍然站在人群边缘。你却把他留成了一个不会伤害你的假设。",
       "怪谈没有追上来。它不需要追。你已经替它完成了最省力的一步：把答案从对方那里拿走。",
+    ],
+    choices: endingChoices,
+  },
+
+  endingArchiveShortcut: {
+    chapter: "结局",
+    code: "E29",
+    speaker: "档案摊",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    ending: true,
+    endingKind: "branch",
+    endingTitle: "单页收尾",
+    endingSummary: "你让一张最像结论的纸替整夜收尾，后半夜的证词没有机会互相校准。",
+    text: [
+      "你带着那一页走到最后一盏灯前。纸面写得很顺，顺到每个犹豫都像被提前修掉。",
+      "秋清读完，没有说纸是假的。他只是问：“那我刚才按住的其他页呢？”",
+      "你答不上来。怪谈没有夺走结局，它只是让你用最省力的一页，把仍然需要时间的部分合上了。",
+    ],
+    choices: endingChoices,
+  },
+
+  endingJointSignature: {
+    chapter: "结局",
+    code: "E30",
+    speaker: "联名签条",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    ending: true,
+    endingKind: "bad",
+    endingTitle: "合并签名",
+    endingSummary: "你把互认写成联名，把此刻在场的人从自己的位置上挤开。",
+    text: [
+      "联名签条被灯火照得很好看。两个名字靠得很近，近到你几乎能相信边界从来没有存在过。",
+      "秋清把签条放回桌面，说：“如果你喜欢的是这个合起来的名字，那它不需要我回答。”",
+      "你没有说出最后一句。因为那句话忽然找不到对象，只剩一枚漂亮到失真的签名。",
+    ],
+    choices: endingChoices,
+  },
+
+  endingPaperBridgeCrowd: {
+    chapter: "结局",
+    code: "E31",
+    speaker: "纸桥",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "unstable",
+    ending: true,
+    endingKind: "bad",
+    endingTitle: "隔桥传话",
+    endingSummary: "你让人群替你读完那句话，告白失去了真正的来源。",
+    text: [
+      "人群把纸条读完时，纸桥终于塌了。塌得很轻，只像一声被热闹吞掉的叹息。",
+      "秋清听见了所有字，却没有听见你。那句话被太多声音分走，反而没有一个声音需要承担它。",
+      "你省下了开口，也省掉了被看见的可能。怪谈把这份轻松记作失败。",
+    ],
+    choices: endingChoices,
+  },
+
+  endingCrowdProof: {
+    chapter: "结局",
+    code: "E32",
+    speaker: "人群边线",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    ending: true,
+    endingKind: "branch",
+    endingTitle: "齐声证明",
+    endingSummary: "你把人声当成保证，秋清被热闹证明成了不能离开的人。",
+    text: [
+      "人群第二次齐声说：他还在这里。声音很大，大到连你都差点相信这就是安全。",
+      "秋清后退时没有撞到任何人，大家自动给他让开一条缝。你这才看见，热闹可以托住场景，也可以围成墙。",
+      "你没有说出那句话。因为你先让人群替他失去了后退的权利。",
+    ],
+    choices: endingChoices,
+  },
+
+  endingBorrowedSilence: {
+    chapter: "结局",
+    code: "E33",
+    speaker: "无声灯",
+    bg: ASSETS.festival,
+    portrait: ASSETS.yuelan,
+    persona: "yuelan",
+    ending: true,
+    endingKind: "branch",
+    endingTitle: "冷静代管",
+    endingSummary: "你把沉默交给月兰山，安静保住了你，却让秋清离开了当前场景。",
+    text: [
+      "月兰山替你把沉默保管得很好。整条灯街都像被整理过，连风都按顺序从摊位之间穿过。",
+      "可秋清不在这份整齐里。你没有受伤，也没有出错，只是把需要由你和他共同面对的一段时间交给了第三个位置。",
+      "月兰山说：“我可以保护他，也可以保护你。但我不能替你们在同一盏灯下相遇。”",
+    ],
+    choices: endingChoices,
+  },
+
+  endingDawnReceipt: {
+    chapter: "结局",
+    code: "E34",
+    speaker: "黎明回执",
+    bg: ASSETS.festival,
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    ending: true,
+    endingKind: "bad",
+    endingTitle: "用黎明交换",
+    endingSummary: "你把坚持当成筹码，黎明没有证明秋清必须回答。",
+    text: [
+      "你把回执递得更近。纸边沾着晨光，看起来像一份终于盖齐的证明。",
+      "秋清接过去，认真看完，又认真还给你。那份认真几乎让你心软，也让失败更清楚。",
+      "他说：“谢谢你走到这里。但我不能因为你走到这里，就把回答交出去。”",
+      "天亮了。天亮只证明夜结束，不证明任何人已经属于任何人。",
     ],
     choices: endingChoices,
   },
@@ -2888,6 +3371,10 @@ const SCENE_EXPANSIONS = {
     "热茶摊的桂花味让你想起故事刚开始的地方。那时你以为找到温暖就能找到答案，现在你知道温暖只是让人有力气继续判断。",
     "秋清喝茶时指尖不再发白。你把这个变化记下来，却没有把它翻译成任何承诺。",
   ],
+  hourTwoCupLedger: [
+    "账单上的水圈慢慢变淡，只有空白栏还清楚。你忽然明白，有些空着的位置不是缺失，是给对方留下的空间。",
+    "秋清没有向你道谢。他只是把杯子重新放稳。这个小动作足够了，至少说明他还愿意把这张桌子留在你们中间。",
+  ],
   hourThreeRoadEdge: [
     "旧路在远处沉默，像一本被合上的错题册。你不再需要重新走进去，才能证明自己记得它的危险。",
     "秋清的影子落在灯下。你把影子、声音和名字分开放好，像把三枚不同重量的硬币放进手账。",
@@ -2907,6 +3394,30 @@ const SCENE_EXPANSIONS = {
   hourSixBlank: [
     "最后一格空白比前五格都重。它像一张没有署名的纸，也像一个真正属于秋清的位置。",
     "你把笔收起来，终于不再试图用预演保护自己。预演保护不了任何人，它只会提前偷走回答。",
+  ],
+  hourSevenArchiveWind: [
+    "后半夜的风没有变冷，只是更耐心。它不急着把你吹向结尾，只把每一张散页都吹到你必须看清的位置。",
+    "秋清按纸页时没有看你。这个不看反而让你安心：他不需要替你确认你正在做对，你也不该把确认交给他的眼神。",
+  ],
+  hourEightNameLedger: [
+    "分栏名册的纸面很薄，薄到能透出上一页的朱印。你忽然发现边界不是墙，而是一种让彼此还能够被准确看见的格式。",
+    "联名签条被你夹进伪线索页。它仍然漂亮，但漂亮不再足以说服你。",
+  ],
+  hourNinePaperBridge: [
+    "纸桥上的朱印慢慢变干。你盯着那一点红色，想起自己一路上有多少次想让某样东西替你把话递出去。",
+    "秋清站在桥的另一侧，没有伸手接你的纸。你反而松了一口气，因为他没有被迫成为这道题的答案。",
+  ],
+  hourTenCrowdDistance: [
+    "半步距离在灯街上很难维持。人群总会推挤，摊位总会招呼，热闹总想把所有犹豫都解释成害羞。",
+    "你把脚尖退回线后。秋清也没有再退。这个停止比靠近更珍贵。",
+  ],
+  hourElevenBorrowedSilence: [
+    "无声灯下的沉默不像惩罚，也不像逃避。它更像一把没有递出去的钥匙，暂时握在你自己手里。",
+    "月兰山没有出现。你第一次觉得，他不出现并不是缺席，而是秋清终于不用把这一段交给他保管。",
+  ],
+  hourTwelveDawnMark: [
+    "黎明把每一枚朱印照得很浅，像在提醒你：再长的夜也不能把别人的回答熬成你的所有物。",
+    "你合上手账时，秋清轻轻碰了碰书脊。不是承诺，只是确认它终于没有再替他说话。",
   ],
   festivalMark: [
     "你把竹签放回木牌时，手指没有抖。不是因为不紧张，而是因为紧张终于有了边界。",
@@ -3645,8 +4156,8 @@ function render() {
   $("chapterPill").textContent = scene.chapter;
   $("personaPill").textContent = personaLabel(scene.persona);
   $("presenceLabel").textContent = presenceText(scene.persona);
-  const estimate = Math.min(360, Math.max(8, Math.round(state.visited.length * 6.5 + state.journals.length * 9)));
-  $("progressPill").textContent = `长篇流程 约 6 小时 · 已读约 ${estimate} 分钟`;
+  const estimate = Math.min(720, Math.max(8, Math.round(state.visited.length * 7.5 + state.journals.length * 10)));
+  $("progressPill").textContent = `长篇流程 约 12 小时 · 已读约 ${estimate} 分钟`;
   $("speaker").textContent = scene.speaker;
   $("sceneCode").textContent = scene.code;
   $("backButton").disabled = !state.backStack.length;

@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "assets": "python scripts/generate_assets.py",
-    "audit:text": "node scripts/text-audit.mjs",
+    "audit:text": "node scripts/text-audit.mjs && node scripts/story-audit.mjs",
     "start": "node server.js",
     "smoke": "node scripts/smoke-test.mjs",
     "smoke:admin": "node scripts/admin-smoke.mjs http://127.0.0.1:4180",
