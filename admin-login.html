@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0f11" />
+    <title>月兰山 · 后台登录</title>
+    <link rel="stylesheet" href="./admin-login.css?v=202605161230" />
+  </head>
+  <body>
+    <main class="loginShell">
+      <section class="loginPanel" aria-label="后台登录">
+        <p>游戏编辑后台</p>
+        <h1>月兰山</h1>
+        <form id="loginForm">
+          <label>用户名<input id="username" name="username" autocomplete="username" required /></label>
+          <label>密码<input id="password" name="password" type="password" autocomplete="current-password" required /></label>
+          <button type="submit">进入后台</button>
+          <span id="loginStatus" role="status"></span>
+        </form>
+      </section>
+    </main>
+    <script src="./admin-login.js?v=202605161230"></script>
+  </body>
+</html>

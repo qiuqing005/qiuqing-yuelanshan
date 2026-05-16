@@ -1,0 +1,241 @@
+:root {
+  color-scheme: dark;
+  --ink: #fff5e5;
+  --muted: #d6c7b2;
+  --gold: #f1b35c;
+  --red: #c94a5d;
+  --line: rgba(255, 245, 229, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #05090a;
+  color: var(--ink);
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+}
+
+.landing {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  align-items: end;
+  padding: clamp(22px, 5vw, 72px);
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(3, 5, 6, 0.9), rgba(3, 5, 6, 0.54) 48%, rgba(3, 5, 6, 0.22)),
+    linear-gradient(180deg, rgba(3, 5, 6, 0.1), rgba(3, 5, 6, 0.88)),
+    var(--cover, url("./assets/images/bg-festival-road.png?v=202605161230")) center / cover;
+}
+
+.landing::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 24% 24%, rgba(241, 179, 92, 0.24), transparent 20%),
+    radial-gradient(circle at 72% 58%, rgba(201, 74, 93, 0.18), transparent 24%);
+  filter: blur(18px);
+  animation: breathe 8s ease-in-out infinite alternate;
+}
+
+.lightGrid {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.026) 1px, transparent 1px, transparent 80px);
+  mask-image: linear-gradient(90deg, black, transparent 70%);
+  animation: drift 18s linear infinite;
+}
+
+.thread {
+  position: absolute;
+  width: 76vw;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 105, 118, 0.9), rgba(241, 179, 92, 0.82), transparent);
+  transform-origin: center;
+  filter: drop-shadow(0 0 12px rgba(255, 95, 116, 0.7));
+}
+
+.threadA {
+  top: 27%;
+  left: -22vw;
+  transform: rotate(-11deg);
+  animation: threadA 7s ease-in-out infinite;
+}
+
+.threadB {
+  right: -30vw;
+  bottom: 22%;
+  transform: rotate(9deg);
+  animation: threadB 9s ease-in-out infinite;
+}
+
+.hero {
+  position: relative;
+  z-index: 2;
+  width: min(920px, 100%);
+  padding-bottom: 4vh;
+  text-shadow: 0 12px 34px rgba(0, 0, 0, 0.62);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--gold);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(3rem, 7.6vw, 7.2rem);
+  line-height: 0.94;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  width: min(620px, 100%);
+  margin: 18px 0 0;
+  color: var(--ink);
+  font-size: clamp(1.05rem, 2vw, 1.45rem);
+  line-height: 1.6;
+}
+
+.intro {
+  width: min(660px, 100%);
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: clamp(0.98rem, 1.5vw, 1.08rem);
+  line-height: 1.85;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.actions a {
+  display: inline-grid;
+  min-height: 46px;
+  align-items: center;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.entry {
+  background: rgba(241, 179, 92, 0.18);
+}
+
+.quiet {
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--muted);
+}
+
+.actions a:hover,
+.actions a:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(241, 179, 92, 0.72);
+  outline: none;
+}
+
+.storyList {
+  width: min(760px, 100%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.storyCard {
+  display: grid;
+  gap: 7px;
+  min-height: 116px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--ink);
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.storyCard:hover,
+.storyCard:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(241, 179, 92, 0.72);
+  outline: none;
+}
+
+.storyCard strong {
+  font-size: 1rem;
+}
+
+.storyCard span,
+.storyCard p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+@keyframes breathe {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 1%, 0) scale(1.05);
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: translate3d(-80px, -80px, 0);
+  }
+}
+
+@keyframes threadA {
+  50% {
+    transform: translateX(8vw) rotate(-7deg);
+  }
+}
+
+@keyframes threadB {
+  50% {
+    transform: translateX(-7vw) rotate(12deg);
+  }
+}
+
+@media (max-width: 680px) {
+  .landing {
+    align-items: end;
+    min-height: 100svh;
+    padding: 18px;
+    background-position: 58% center;
+  }
+
+  .hero {
+    padding-bottom: 2vh;
+  }
+
+  .intro {
+    line-height: 1.7;
+  }
+
+  .storyList {
+    grid-template-columns: 1fr;
+  }
+}

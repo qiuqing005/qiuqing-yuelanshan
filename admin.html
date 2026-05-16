@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101418" />
+    <title>月兰山 · 游戏编辑后台</title>
+    <link rel="stylesheet" href="./admin.css?v=202605161230" />
+  </head>
+  <body>
+    <div class="adminShell">
+      <header class="topbar">
+        <div>
+          <p>游戏编辑后台</p>
+          <h1>月兰山</h1>
+        </div>
+        <div class="storyManager">
+          <label>当前故事
+            <select id="storySelect" class="input"></select>
+          </label>
+          <label class="inlineCheck"><input id="storyPublishedToggle" type="checkbox" /> 已发布</label>
+          <button id="newStoryButton" type="button">新建故事</button>
+          <button id="deleteStoryButton" type="button" class="danger">删除故事</button>
+        </div>
+        <div class="topActions">
+          <a href="/" target="_blank" rel="noreferrer">故事页</a>
+          <a id="openStoryLink" href="/yuelanshan" target="_blank" rel="noreferrer">打开游戏</a>
+          <button id="reloadButton" type="button">重新读取</button>
+          <button id="saveButton" type="button">保存发布</button>
+          <button id="logoutButton" type="button">退出</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="leftPanel">
+          <section class="panel">
+            <div class="panelHead">
+              <h2>剧情流程图</h2>
+              <button id="addSceneButton" type="button">新增场景</button>
+            </div>
+            <input id="sceneSearch" class="input" placeholder="搜索场景、说话人、正文" />
+            <div id="sceneList" class="sceneList"></div>
+          </section>
+        </aside>
+
+        <section class="centerPanel">
+          <div class="flowToolbar">
+            <span id="statusText">读取中</span>
+            <div class="flowActions">
+              <button id="linkModeButton" type="button">快速连线</button>
+              <button id="fitFlowButton" type="button">回到起点</button>
+              <label><input id="showOnlyReachable" type="checkbox" checked /> 只显示主流程可达节点</label>
+            </div>
+          </div>
+          <div id="flowCanvas" class="flowCanvas">
+            <svg id="flowSvg"></svg>
+            <div id="flowNodes"></div>
+          </div>
+        </section>
+
+        <aside class="rightPanel">
+          <section class="panel editorPanel">
+            <div class="tabs">
+              <button class="tab" data-tab="story">故事</button>
+              <button class="tab active" data-tab="scene">剧情</button>
+              <button class="tab" data-tab="choice">选项</button>
+              <button class="tab" data-tab="archive">档案</button>
+              <button class="tab" data-tab="media">媒体</button>
+              <button class="tab" data-tab="final">终局</button>
+              <button class="tab" data-tab="raw">JSON</button>
+            </div>
+
+            <div id="tab-story" class="tabPane">
+              <label>故事 ID<input id="storyId" class="input" readonly /></label>
+              <label>故事标题<input id="storyTitle" class="input" /></label>
+              <label>副标题<input id="storySubtitle" class="input" /></label>
+              <label>访问后缀<input id="storyPath" class="input" placeholder="/yuelanshan 或 /new-story" /></label>
+              <label>入口按钮文案<input id="storyEntryLabel" class="input" /></label>
+              <label>封面图 URL / 资源路径<input id="storyCover" class="input" /></label>
+              <label>故事简介<textarea id="storyIntro" class="textarea tall"></textarea></label>
+              <label class="inlineCheck"><input id="storyPublished" type="checkbox" /> 发布到玩家可访问路径</label>
+              <div class="rowActions">
+                <button id="applyStoryButton" type="button">应用故事修改</button>
+              </div>
+            </div>
+
+            <div id="tab-scene" class="tabPane active">
+              <label>场景 ID<input id="sceneId" class="input" /></label>
+              <label>跳转显示名<input id="sceneName" class="input" placeholder="例如：烧页 01 · 信封灰烬" /></label>
+              <div class="grid2">
+                <label>章节<input id="sceneChapter" class="input" /></label>
+                <label>编号<input id="sceneCode" class="input" /></label>
+              </div>
+              <div class="grid2">
+                <label>说话人<input id="sceneSpeaker" class="input" /></label>
+                <label>人格状态
+                  <select id="scenePersona" class="input">
+                    <option value="none">未定场景</option>
+                    <option value="qiuqing">秋清出现</option>
+                    <option value="yuelan">月兰山出现</option>
+                    <option value="unstable">人格摇晃</option>
+                  </select>
+                </label>
+              </div>
+              <label>背景图 URL / 资源路径<input id="sceneBg" class="input" /></label>
+              <label>立绘 URL / 资源路径<input id="scenePortrait" class="input" /></label>
+              <label>剧情正文<textarea id="sceneText" class="textarea tall" placeholder="每段一行"></textarea></label>
+              <label>附加段落<textarea id="sceneExpansion" class="textarea" placeholder="每段一行"></textarea></label>
+              <div>
+                <h3>进入本场景时</h3>
+                <div id="sceneEffectsBuilder" class="effectBuilder"></div>
+              </div>
+              <label>高级配置 JSON<textarea id="sceneEffects" class="textarea code" spellcheck="false"></textarea></label>
+              <div class="rowActions">
+                <button id="applySceneButton" type="button">应用场景修改</button>
+                <button id="deleteSceneButton" type="button" class="danger">删除覆盖</button>
+              </div>
+            </div>
+
+            <div id="tab-choice" class="tabPane">
+              <div id="choicesEditor"></div>
+              <button id="addChoiceButton" type="button">新增选项</button>
+              <p class="hint">可以设置跳转、可见条件、可点击条件、获得与移除的状态/道具/线索；高级 JSON 仍可处理特殊数值变化。</p>
+            </div>
+
+            <div id="tab-archive" class="tabPane">
+              <div class="grid3">
+                <button id="editRulesButton" type="button">规则档案</button>
+                <button id="editCluesButton" type="button">线索/假线索</button>
+                <button id="editJournalsButton" type="button">手账</button>
+              </div>
+              <div id="archiveList" class="archiveList"></div>
+              <div id="archiveEditor" class="archiveEditor"></div>
+            </div>
+
+            <div id="tab-media" class="tabPane">
+              <h3>音乐与音效</h3>
+              <label>环境音乐<input id="audioAmbience" class="input" /></label>
+              <label>翻页音效<input id="audioPage" class="input" /></label>
+              <label>结局音效<input id="audioChime" class="input" /></label>
+              <h3>上传媒体</h3>
+              <div class="uploadRow">
+                <input id="mediaFile" class="input" type="file" accept="image/*,audio/*" />
+                <button id="uploadMediaButton" type="button">上传到服务器</button>
+              </div>
+              <div class="mediaTools">
+                <input id="mediaSearch" class="input" placeholder="搜索文件名或路径" />
+                <select id="mediaTypeFilter" class="input">
+                  <option value="all">全部媒体</option>
+                  <option value="image">图片</option>
+                  <option value="audio">音频</option>
+                </select>
+                <button id="refreshMediaButton" type="button">刷新媒体库</button>
+              </div>
+              <div id="mediaPreview" class="mediaPreview"></div>
+              <div id="mediaLibrary" class="mediaLibrary"></div>
+              <input id="replaceMediaFile" type="file" accept="image/*,audio/*" hidden />
+              <h3>资源别名</h3>
+              <div id="assetEditor" class="assetEditor"></div>
+              <button id="addAssetButton" type="button">新增资源别名</button>
+            </div>
+
+            <div id="tab-final" class="tabPane">
+              <label><input id="finalGateEnabled" type="checkbox" /> 启用最终表白缺失判定</label>
+              <label>胜利选项文本<input id="finalChoiceLabel" class="input" /></label>
+              <label>失败场景 ID<input id="finalMissingScene" class="input" /></label>
+              <div id="finalConditions" class="conditionList"></div>
+              <button id="addConditionButton" type="button">新增失败条件</button>
+              <p class="hint">如果玩家最后表白时缺少这些 rule / clue / item / journal / fragment / flag，会跳到失败场景并显示缺失项。</p>
+            </div>
+
+            <div id="tab-raw" class="tabPane">
+              <textarea id="rawJson" class="textarea raw" spellcheck="false"></textarea>
+              <div class="rowActions">
+                <button id="applyRawButton" type="button">应用 JSON</button>
+                <button id="resetOverridesButton" class="danger" type="button">清空后台覆盖</button>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script src="./admin.js?v=202605161230"></script>
+  </body>
+</html>

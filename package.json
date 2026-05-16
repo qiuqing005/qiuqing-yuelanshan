@@ -1,0 +1,21 @@
+{
+  "name": "qiuqing-yuelanshan",
+  "version": "1.0.0",
+  "description": "互动叙事游戏与可视化编辑后台。",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "assets": "python scripts/generate_assets.py",
+    "audit:text": "node scripts/text-audit.mjs",
+    "start": "node server.js",
+    "smoke": "node scripts/smoke-test.mjs",
+    "smoke:admin": "node scripts/admin-smoke.mjs http://127.0.0.1:4180",
+    "smoke:local": "node scripts/smoke-test.mjs http://127.0.0.1:4180"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

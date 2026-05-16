@@ -1,0 +1,97 @@
+:root {
+  color-scheme: dark;
+  --ink: #f5efe2;
+  --muted: #bbb3a4;
+  --gold: #f0b35b;
+  --line: rgba(255, 255, 255, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  background:
+    linear-gradient(120deg, rgba(14, 19, 20, 0.78), rgba(10, 13, 14, 0.96)),
+    url("./assets/images/bg-mirror-room.png") center / cover fixed;
+}
+
+.loginShell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.loginPanel {
+  width: min(420px, 100%);
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(10, 13, 14, 0.88);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+}
+
+.loginPanel p {
+  margin: 0 0 6px;
+  color: var(--gold);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.loginPanel h1 {
+  margin: 0 0 22px;
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+input,
+button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font: inherit;
+}
+
+input {
+  padding: 10px 12px;
+  background: rgba(3, 6, 7, 0.82);
+  color: var(--ink);
+  outline: none;
+}
+
+button {
+  margin-top: 4px;
+  background: rgba(240, 179, 91, 0.18);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+button:hover,
+button:focus-visible {
+  border-color: rgba(240, 179, 91, 0.68);
+  outline: none;
+}
+
+#loginStatus {
+  min-height: 1.2em;
+  color: #e58b8b;
+  font-size: 0.86rem;
+}

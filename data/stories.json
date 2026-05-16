@@ -1,0 +1,17 @@
+{
+  "activeId": "yuelanshan",
+  "stories": [
+    {
+      "id": "yuelanshan",
+      "title": "告白怪谈：秋清与月兰山",
+      "subtitle": "在一次只能说出口的表白之前，先学会分清谁在场。",
+      "intro": "你收到一只被红线缝死的信封。它没有把规则交给你，只把你推向茶铺、旧路、镜室和祭灯夜。每一次选择都会改变你能相信的东西；每一条线索，也可能在下一次相遇里翻面。",
+      "entryLabel": "进入故事",
+      "path": "/yuelanshan",
+      "cover": "./assets/images/bg-festival-road.png",
+      "published": true,
+      "createdAt": "2026-05-15T18:22:02.933Z",
+      "updatedAt": "2026-05-15T18:39:30.666Z"
+    }
+  ]
+}

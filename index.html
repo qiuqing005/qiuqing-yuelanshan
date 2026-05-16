@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1013" />
+    <title>告白怪谈：秋清与月兰山</title>
+    <link rel="stylesheet" href="./styles.css?v=202605161230" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <main class="layout">
+        <section id="stage" class="stage" aria-live="polite">
+          <div class="stageShade"></div>
+          <div class="stageTop">
+            <div>
+              <p class="eyebrow">表白怪谈</p>
+              <h1 id="gameTitle">秋清与月兰山</h1>
+            </div>
+            <div class="topMeters" aria-label="当前流程状态">
+              <span id="chapterPill">序章</span>
+              <span id="personaPill">未接触</span>
+              <span id="progressPill">预计 65-100 分钟</span>
+            </div>
+          </div>
+
+          <img id="portrait" class="portrait" alt="" />
+
+          <article class="dialogue">
+            <div class="dialogueHead">
+              <span id="speaker">旁白</span>
+              <div class="dialogueTools">
+                <button id="backButton" class="backButton" type="button" aria-label="返回上一步" title="返回上一步">↶</button>
+                <span id="sceneCode">00</span>
+              </div>
+            </div>
+            <div id="text" class="text"></div>
+            <div id="choices" class="choices"></div>
+          </article>
+        </section>
+
+        <aside class="sidebar">
+          <section class="panel soundPanel">
+            <div class="panelTitle">
+              <span>声音</span>
+              <button id="soundToggle" class="iconButton" type="button" aria-label="启用或关闭声音">♪</button>
+            </div>
+            <label class="rangeLabel" for="volumeRange">音量</label>
+            <input id="volumeRange" class="range" type="range" min="0" max="100" value="38" />
+          </section>
+
+          <section class="panel">
+            <div class="panelTitle">
+              <span>人格状态</span>
+              <span id="presenceLabel">等待观察</span>
+            </div>
+            <div class="meters">
+              <div class="meter">
+                <span>快乐</span>
+                <div class="bar"><i id="joyBar"></i></div>
+              </div>
+              <div class="meter">
+                <span>孤独</span>
+                <div class="bar"><i id="lonelyBar"></i></div>
+              </div>
+              <div class="meter">
+                <span>理性</span>
+                <div class="bar"><i id="logicBar"></i></div>
+              </div>
+              <div class="meter">
+                <span>喜欢</span>
+                <div class="bar"><i id="likeBar"></i></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel tabsPanel">
+            <div class="tabs" role="tablist" aria-label="线索与规则">
+              <button class="tab active" id="tabRules" type="button" role="tab" aria-selected="true">规则档案</button>
+              <button class="tab" id="tabClues" type="button" role="tab" aria-selected="false">线索</button>
+              <button class="tab" id="tabJournal" type="button" role="tab" aria-selected="false">手账</button>
+              <button class="tab" id="tabHistory" type="button" role="tab" aria-selected="false">结局/历史</button>
+            </div>
+            <div id="rulesPane" class="pane active" role="tabpanel"></div>
+            <div id="cluesPane" class="pane" role="tabpanel"></div>
+            <div id="journalPane" class="pane" role="tabpanel"></div>
+            <div id="historyPane" class="pane" role="tabpanel"></div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <audio id="ambienceAudio" src="./assets/audio/ambience.mp3?v=202605161230" preload="auto" loop></audio>
+    <audio id="pageAudio" src="./assets/audio/page-turn.mp3?v=202605161230" preload="auto"></audio>
+    <audio id="chimeAudio" src="./assets/audio/chime.mp3?v=202605161230" preload="auto"></audio>
+    <script src="./app.js?v=202605161230"></script>
+  </body>
+</html>
