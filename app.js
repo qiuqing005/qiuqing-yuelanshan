@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 
-const RESOURCE_VERSION = "202605162151";
+const RESOURCE_VERSION = "202605162330";
 
 const ASSETS = {
   night: "./assets/images/bg-night-road.png",
@@ -3184,14 +3184,150 @@ const SCENES = {
 
 const LARGE_EXPANSION = {
   openings: [
-    ["opening01", "门缝雨声", "从门缝里的雨声开局", ASSETS.mirror, "雨声"],
-    ["opening02", "茶票背面", "从茶票背面的地址开局", ASSETS.tea, "茶票"],
-    ["opening03", "旧路末班", "从旧路末班车开局", ASSETS.night, "末班车"],
-    ["opening04", "镜室晨雾", "从镜室晨雾开局", ASSETS.mirror, "镜雾"],
-    ["opening05", "校医空灯", "从校医室空灯开局", ASSETS.gate, "空灯"],
-    ["opening06", "图书归还", "从图书室归还处开局", ASSETS.gate, "归还处"],
-    ["opening07", "祭灯预告", "从祭灯预告单开局", ASSETS.festival, "预告单"],
-    ["opening08", "无声演练", "从无声演练手账开局", ASSETS.festival, "手账"],
+    {
+      id: "opening01",
+      title: "门缝雨声",
+      entryLabel: "从门缝里的雨声开局",
+      bg: ASSETS.mirror,
+      motif: "门缝雨声",
+      place: "宿舍门口",
+      object: "一截湿红线",
+      question: "秋清是不是也听见了这场不该存在的雨",
+      hint: "月兰山把字写在水痕边：先分清敲门声和邀请。",
+      exits: [
+        ["把湿红线夹进手账，从烧毁信封切入", "ashPage", "Careful"],
+        ["先拨通电话，听秋清那边有没有雨", "phoneStatic", "Companion"],
+        ["沿雨声下楼，直接去旧路雨棚", "rainShelter", "Doubt"],
+        ["把水痕照进镜面，从镜室切入", "mirrorRoom", "Mirror"],
+      ],
+      echo: ["ashPage", "Careful", "把门缝雨声和纸灰并在一起", "ashPuzzle"],
+    },
+    {
+      id: "opening02",
+      title: "茶票背面",
+      entryLabel: "从茶票背面的地址开局",
+      bg: ASSETS.tea,
+      motif: "茶票背面的铅笔字",
+      place: "茶铺后门",
+      object: "半张写错桌号的茶票",
+      question: "秋清为什么把桌号涂掉，只留下地址",
+      hint: "月兰山在票角补了一点墨：地址会骗人，座位不会。",
+      exits: [
+        ["按桌号入座，先和秋清碰面", "teaMeet", "Companion"],
+        ["把茶票和灰烬一起比对", "ashLedger", "Careful"],
+        ["照票背号码拨过去", "phoneStatic", "Doubt"],
+        ["绕到雨棚，看谁在等这张票", "rainShelter", "Shadow"],
+      ],
+      echo: ["teaMeet", "Companion", "把茶票背面的桌号轻声告诉秋清", "teaWarm"],
+    },
+    {
+      id: "opening03",
+      title: "旧路末班",
+      entryLabel: "从旧路末班车开局",
+      bg: ASSETS.night,
+      motif: "末班车报站声",
+      place: "废弃公交站",
+      object: "一枚没有打孔的车票",
+      question: "秋清是上了车，还是被车站留下",
+      hint: "月兰山把站牌擦亮一格：不要追车，先看谁没有影子。",
+      exits: [
+        ["留在站牌下，把车票当证词", "busStop", "Careful"],
+        ["退到雨棚，等秋清自己出现", "rainShelter", "Companion"],
+        ["沿报站声打电话确认方向", "phoneStatic", "Doubt"],
+        ["把车票带去茶铺问座位", "teaMeet", "Shadow"],
+      ],
+      echo: ["busStop", "Careful", "把末班车停靠时间记到站牌背面", "mirrorRoom"],
+    },
+    {
+      id: "opening04",
+      title: "镜室晨雾",
+      entryLabel: "从镜室晨雾开局",
+      bg: ASSETS.mirror,
+      motif: "镜面晨雾",
+      place: "废楼镜室",
+      object: "两枚方向相反的指印",
+      question: "哪一枚指印属于真正站在这里的人",
+      hint: "月兰山没有擦雾，只说：先承认镜子也会迟到。",
+      exits: [
+        ["按指印方向进入镜室", "mirrorRoom", "Mirror"],
+        ["把雾气里的数字并回烧页", "ashPuzzle", "Careful"],
+        ["顺着反向指印去校医室", "clinicCorridor", "Doubt"],
+        ["先回茶铺确认杯口方向", "teaMeet", "Companion"],
+      ],
+      echo: ["mirrorRoom", "Mirror", "把晨雾里的反向指印压在镜框边", "mirrorCipher"],
+    },
+    {
+      id: "opening05",
+      title: "校医空灯",
+      entryLabel: "从校医室空灯开局",
+      bg: ASSETS.gate,
+      motif: "校医室空灯",
+      place: "旧校医室走廊",
+      object: "一张没有签名的请假条",
+      question: "请假条是在替谁遮住缺席",
+      hint: "月兰山把灯绳绕了一圈：空灯不是没人，是有人没被允许出声。",
+      exits: [
+        ["沿灯绳走进校医室", "clinicCorridor", "Careful"],
+        ["隔着门先听完里面的录音", "clinicDoor", "Companion"],
+        ["把请假条号码带去图书室", "libraryDoor", "Doubt"],
+        ["先拨电话问秋清是否记得校医室", "phoneStatic", "Shadow"],
+      ],
+      echo: ["clinicCorridor", "Careful", "把空灯的拉绳绕回门把", "clinicDoor"],
+    },
+    {
+      id: "opening06",
+      title: "图书归还",
+      entryLabel: "从图书室归还处开局",
+      bg: ASSETS.gate,
+      motif: "归还箱里的落签声",
+      place: "旧图书室门外",
+      object: "一张夹错页码的书签",
+      question: "秋清借走的到底是书名，还是被借走的名字",
+      hint: "月兰山把借阅号划成两列：不要替两个人合成一个签名。",
+      exits: [
+        ["按借阅号进入图书室", "libraryDoor", "Careful"],
+        ["先去书架找被借走的书名", "libraryStacks", "Doubt"],
+        ["把书签夹进失物柜登记簿", "lostCabinet", "Shadow"],
+        ["把页码并回茶票账单", "ashLedger", "Companion"],
+      ],
+      echo: ["libraryDoor", "Careful", "把夹错页码的书签插回借阅卡", "libraryStacks"],
+    },
+    {
+      id: "opening07",
+      title: "祭灯预告",
+      entryLabel: "从祭灯预告单开局",
+      bg: ASSETS.festival,
+      motif: "祭灯预告单",
+      place: "祭灯摊前",
+      object: "一枚提前盖好的朱印",
+      question: "预告单为什么知道你会来得太早",
+      hint: "月兰山把朱印推远：提前抵达不等于提前知道答案。",
+      exits: [
+        ["拿着朱印进入祭灯夜", "festivalThreshold", "Careful"],
+        ["先推开试胆局的纸门", "paperDoor", "Doubt"],
+        ["把预告单带回茶铺问秋清", "teaMeet", "Companion"],
+        ["把朱印放进失物柜，等它认领自己", "lostCabinet", "Shadow"],
+      ],
+      echo: ["paperDoor", "Doubt", "把提前盖好的朱印按在纸门边", "festivalThreshold"],
+    },
+    {
+      id: "opening08",
+      title: "无声演练",
+      entryLabel: "从无声演练手账开局",
+      bg: ASSETS.festival,
+      motif: "无声演练手账",
+      place: "祭灯后台",
+      object: "一页只写动作不写台词的排练表",
+      question: "你能不能先学会停顿，再决定要不要告白",
+      hint: "月兰山把空白留给秋清：演练不是替他说，是给他后退的位置。",
+      exits: [
+        ["照排练表先走到纸门前", "paperDoor", "Careful"],
+        ["把停顿带回雨棚，等秋清开口", "rainShelter", "Companion"],
+        ["把空白页带进祭灯夜", "festivalThreshold", "Doubt"],
+        ["先回茶铺确认他愿不愿意听", "teaMeet", "Shadow"],
+      ],
+      echo: ["festivalThreshold", "Doubt", "把无声演练的空拍留在灯下", "hourOneBorrowedFire"],
+    },
   ],
   theaters: [
     ["theater01", "信封夹层小剧场", ASSETS.mirror, "夹层"],
@@ -3214,15 +3350,12 @@ const LARGE_EXPANSION = {
   ],
 };
 
+function openingSceneId(id, index) {
+  return `${id}_${String(index).padStart(2, "0")}`;
+}
+
 function generatedText(kind, title, motif, index, total) {
   const step = `${index}/${total}`;
-  if (kind === "opening") {
-    return [
-      `【${title} · ${step}】${motif}先于信封出现，像把今晚的顺序轻轻拨乱。`,
-      `你听见秋清的声音停在很远的地方：“如果从这里开始，就不要急着把我解释完。”`,
-      `月兰山没有出现，只在空白处留下一行冷静的批注：开局不是答案，只是第一枚可追踪的针脚。`,
-    ];
-  }
   if (kind === "theater") {
     return [
       `【${title} · ${step}】你没有立刻退回原处，而是把刚才差点做出的选择夹进${motif}里。`,
@@ -3235,6 +3368,247 @@ function generatedText(kind, title, motif, index, total) {
     `秋清问：“这一段也必须走完吗？”你回答：“不是必须，是我不想再把省略误会成勇敢。”`,
     `月兰山的批注压在页角：长线不是拖延。长线让每一次判断都留下来源。`,
   ];
+}
+
+function addOpeningScene(profile, index, { speaker = "旁白", persona = "none", portrait = "", text, choices, effects }) {
+  SCENES[openingSceneId(profile.id, index)] = {
+    chapter: "分歧开局",
+    code: `${profile.id.toUpperCase()}-${String(index).padStart(2, "0")}`,
+    speaker,
+    bg: profile.bg,
+    portrait,
+    persona,
+    expansionGroup: { type: "opening", id: profile.id, index, length: 20, branched: true },
+    text,
+    effects,
+    choices,
+  };
+}
+
+function openingChoice(label, next, flags = [], stats = { logic: 1 }) {
+  return { label, next, effects: { flags, stats } };
+}
+
+function addBranchingOpening(profile) {
+  const id = profile.id;
+  const flag = (name) => `${id}${name}`;
+  const next = (index) => openingSceneId(id, index);
+  const [exitCareful, exitCompanion, exitDoubt, exitShadow] = profile.exits;
+
+  addOpeningScene(profile, 1, {
+    text: [
+      `你没有从信封开始。${profile.motif}先把你带到${profile.place}，${profile.object}压在最不该出现的位置。`,
+      `如果从这里开局，今晚的第一件事不是告白，而是决定你要相信哪一种顺序。`,
+      profile.hint,
+    ],
+    choices: [
+      openingChoice(`追着${profile.motif}确认源头`, next(2), [flag("Trace")], { logic: 2 }),
+      openingChoice(`先判断${profile.question}`, next(3), [flag("Care")], { like: 2, logic: 1 }),
+    ],
+  });
+  addOpeningScene(profile, 2, {
+    speaker: "旁白",
+    text: [
+      `${profile.object}没有解释自己，只把你带向更小的异常：边缘干净，中间却像被谁攥过。`,
+      "你可以把它收走，也可以先尊重它停在原处的姿态。两种做法都会把今晚推向不同入口。",
+    ],
+    choices: [
+      openingChoice(`把${profile.object}收进手账边页`, next(4), [flag("Collected")], { logic: 2 }),
+      openingChoice(`只记位置，不动${profile.object}`, next(5), [flag("LeftInPlace")], { logic: 1, lonely: 1 }),
+    ],
+  });
+  addOpeningScene(profile, 3, {
+    speaker: "秋清",
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      `你想到秋清听见${profile.motif}时可能会先沉默。不是逃避，是他还没确认自己有没有被允许回答。`,
+      "这一次你可以先替他留出退路，也可以把担心说成一个具体问题。",
+    ],
+    choices: [
+      openingChoice("先给秋清留出一句不必回答的话", next(6), [flag("RoomForQiuqing")], { like: 3 }),
+      openingChoice("把担心说成一个可以回答的问题", next(7), [flag("AskedClearly")], { logic: 2, like: 1 }),
+    ],
+  });
+  addOpeningScene(profile, 4, {
+    text: [
+      `手账合上时，${profile.object}让纸页鼓起一小块。你第一次意识到，证据也会改变携带它的人。`,
+      "如果把这份改变藏起来，你会更冷静；如果把它告诉秋清，你会更早暴露自己的犹豫。",
+    ],
+    choices: [
+      openingChoice("把异常先藏在索引页", next(8), [flag("PrivateIndex")], { logic: 2 }),
+      openingChoice("准备稍后把这页给秋清看", next(9), [flag("ShareLater")], { like: 2 }),
+    ],
+  });
+  addOpeningScene(profile, 5, {
+    text: [
+      `你没有碰${profile.object}。它留在原处，反而像替你占住了一个座位。`,
+      "月兰山的批注从旁边浮出来：不拿走，不代表没有选择；有时旁观也是一种站位。",
+    ],
+    choices: [
+      openingChoice("在原处留下自己的记号", next(9), [flag("MarkedPlace")], { logic: 1, like: 1 }),
+      openingChoice("把原处当成之后要回来的坐标", next(10), [flag("ReturnPoint")], { logic: 2 }),
+    ],
+  });
+  addOpeningScene(profile, 6, {
+    speaker: "秋清",
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "你把想问的话拆成两半：一半留给事实，一半留给秋清可以拒绝的空间。",
+      "这不像退让，更像先把门打开一条缝，让里面的人自己决定要不要走出来。",
+    ],
+    choices: [
+      openingChoice("把空间留到见面之后", next(10), [flag("DelayedQuestion")], { like: 2, logic: 1 }),
+      openingChoice("现在就把问题写成短信草稿", next(11), [flag("DraftedQuestion")], { logic: 2 }),
+    ],
+  });
+  addOpeningScene(profile, 7, {
+    speaker: "秋清",
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      `你把“担心”改写成一件可核对的小事：${profile.question}。`,
+      "句子一具体，就不再像逼问。它开始像一盏灯，照见你真正想保护的边界。",
+    ],
+    choices: [
+      openingChoice("把这句留给电话", next(11), [flag("PhoneQuestion")], { logic: 2 }),
+      openingChoice("把这句留到现场", next(8), [flag("SceneQuestion")], { like: 2 }),
+    ],
+  });
+  addOpeningScene(profile, 8, {
+    speaker: "月兰山",
+    portrait: ASSETS.yuelan,
+    persona: "yuelan",
+    text: [
+      "月兰山像是早知道你会把证据藏起来。他没有拦，只把手账推回你面前。",
+      "“藏不是错，”他说，“错的是藏到连你自己都忘记它为什么重要。”",
+    ],
+    choices: [
+      openingChoice("给这条证据写下来源", next(12), [flag("Sourced")], { logic: 3 }),
+      openingChoice("先写下它让你想起谁", next(13), [flag("NamedFeeling")], { like: 2 }),
+    ],
+  });
+  addOpeningScene(profile, 9, {
+    speaker: "旁白",
+    text: [
+      "你把要不要共享证据这件事放到桌面上。它忽然不像攻略问题，更像一次练习：怎样靠近，又不替对方回答。",
+      "秋清的名字在页边停住，没有被圈起来。",
+    ],
+    choices: [
+      openingChoice("把证据留给共同确认", next(13), [flag("MutualCheck")], { like: 2, logic: 1 }),
+      openingChoice("把证据拆成可反驳的两句", next(14), [flag("Refutable")], { logic: 3 }),
+    ],
+  });
+  addOpeningScene(profile, 10, {
+    speaker: "旁白",
+    text: [
+      "原处没有因为你离开而消失。相反，它在脑内变得更清楚，像地图上一个被按住的点。",
+      "你开始明白，开局不是先后顺序，而是你愿意把哪一种责任带到后面。",
+    ],
+    choices: [
+      openingChoice("把坐标交给路线判断", next(14), [flag("RoutePoint")], { logic: 2 }),
+      openingChoice("把坐标交给人的距离", next(15), [flag("DistancePoint")], { like: 2 }),
+    ],
+  });
+  addOpeningScene(profile, 11, {
+    speaker: "秋清",
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "短信草稿写到一半，你删掉了“你必须告诉我”。剩下的句子短了很多，也诚实了很多。",
+      "你没有变得更勇敢，只是终于不把急切误认为真心。",
+    ],
+    choices: [
+      openingChoice("把草稿改成一句邀请", next(15), [flag("Invitation")], { like: 3 }),
+      openingChoice("把草稿改成一句记录", next(16), [flag("Record")], { logic: 3 }),
+    ],
+  });
+  addOpeningScene(profile, 12, {
+    text: [
+      "来源写下去之后，纸面安静了。你知道自己接下来更适合先处理证据，而不是急着确认感情。",
+      "这条开局会把你推向更冷静的入口。",
+    ],
+    choices: [openingChoice("沿证据的顺序定下开局", next(17), [flag("PathCareful")], { logic: 3 })],
+  });
+  addOpeningScene(profile, 13, {
+    speaker: "秋清",
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "你写下的不是答案，而是“我想和你一起确认”。秋清的名字因此没有被放进证物袋里。",
+      "这条开局会让后面的相遇多一层互相确认。",
+    ],
+    choices: [openingChoice("沿共同确认定下开局", next(18), [flag("PathCompanion")], { like: 3, logic: 1 })],
+  });
+  addOpeningScene(profile, 14, {
+    speaker: "月兰山",
+    portrait: ASSETS.yuelan,
+    persona: "yuelan",
+    text: [
+      "你把证据拆成两句，一句能支持你，一句能反驳你。月兰山看了很久，终于点头。",
+      "这条开局不会让你更快，却会让你少一点把愿望当事实的冲动。",
+    ],
+    choices: [openingChoice("沿可反驳的线定下开局", next(19), [flag("PathDoubt")], { logic: 3, lonely: 1 })],
+  });
+  addOpeningScene(profile, 15, {
+    speaker: "秋清",
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "你把人的距离放在路线之前。这样做不一定聪明，但至少没有把秋清当成谜题的一部分。",
+      "这条开局会让后面的选择更早触碰他的沉默。",
+    ],
+    choices: [openingChoice("沿人的距离定下开局", next(18), [flag("PathCompanion")], { like: 3 })],
+  });
+  addOpeningScene(profile, 16, {
+    speaker: "月兰山",
+    portrait: ASSETS.yuelan,
+    persona: "yuelan",
+    text: [
+      "记录比邀请更冷，冷到月兰山愿意接过去看一眼。",
+      "他没有夸你，也没有提醒你。只是把那句记录折到背面，像把一条暗线留给之后。",
+    ],
+    choices: [openingChoice("沿暗线定下开局", next(20), [flag("PathShadow")], { logic: 2, lonely: 2 })],
+  });
+  addOpeningScene(profile, 17, {
+    text: [
+      `你把${profile.object}放进手账最前页。这个开局从证据开始，后面每一次靠近都必须先说明来源。`,
+      "它不会替你避开误会，但会让误会有地方被拆开。",
+    ],
+    effects: { flags: [flag(exitCareful[2]), flag("Complete")], stats: { logic: 4 } },
+    choices: [{ label: exitCareful[0], next: exitCareful[1], primary: true }],
+  });
+  addOpeningScene(profile, 18, {
+    speaker: "秋清",
+    portrait: ASSETS.qiuqing,
+    persona: "qiuqing",
+    text: [
+      "你把第一步留给共同确认。秋清仍然可能沉默，但那不再是你要立刻填满的空白。",
+      "这个开局会让后面的相处更慢，也更难被怪谈替换。",
+    ],
+    effects: { flags: [flag(exitCompanion[2]), flag("Complete")], stats: { like: 4, logic: 1 } },
+    choices: [{ label: exitCompanion[0], next: exitCompanion[1], primary: true }],
+  });
+  addOpeningScene(profile, 19, {
+    speaker: "月兰山",
+    portrait: ASSETS.yuelan,
+    persona: "yuelan",
+    text: [
+      "你允许自己存疑。月兰山把这两个字圈起来，像终于看见你没有把攻略当成答案。",
+      "这个开局会把你带向更绕的路，但绕路里会留下新的证词。",
+    ],
+    effects: { flags: [flag(exitDoubt[2]), flag("Complete")], stats: { logic: 4, lonely: 1 } },
+    choices: [{ label: exitDoubt[0], next: exitDoubt[1], primary: true }],
+  });
+  addOpeningScene(profile, 20, {
+    text: [
+      "你没有把暗线立刻交出去。它留在手账背面，像一枚稍后才会显影的朱印。",
+      "这个开局会更早触碰怪谈的边缘，也会让之后的某些旁枝改口。",
+    ],
+    effects: { flags: [flag(exitShadow[2]), flag("Complete")], stats: { logic: 2, lonely: 3 } },
+    choices: [{ label: exitShadow[0], next: exitShadow[1], primary: true }],
+  });
 }
 
 function addLinearSequence({ id, type, title, bg, motif, length, finalChoice, finalNext, returnToStored = false }) {
@@ -3261,6 +3635,20 @@ function addLinearSequence({ id, type, title, bg, motif, length, finalChoice, fi
   }
 }
 
+function addOpeningEchoChoices() {
+  LARGE_EXPANSION.openings.forEach((profile) => {
+    const [sceneId, routeName, label, next] = profile.echo;
+    const scene = SCENES[sceneId];
+    if (!scene || scene.choices?.some((choice) => choice.label === label)) return;
+    scene.choices.push({
+      label,
+      next,
+      showFlags: [`${profile.id}${routeName}`],
+      effects: { flags: [`${profile.id}EchoUsed`], stats: { logic: 2, like: 1 } },
+    });
+  });
+}
+
 function incomingSceneMap() {
   const map = {};
   Object.entries(SCENES).forEach(([sceneId, scene]) => {
@@ -3284,21 +3672,13 @@ function foreshadowChoiceLabel(theaterTitle, index) {
 }
 
 function installLargeExpansionContent() {
-  LARGE_EXPANSION.openings.forEach(([id, title, entryLabel, bg, motif]) => {
-    addLinearSequence({
-      id,
-      type: "opening",
-      title,
-      bg,
-      motif,
-      length: 20,
-      finalChoice: "带着这段开局翻检烧毁的信封",
-      finalNext: "ashPage",
-    });
-    if (!SCENES.intro.choices.some((choice) => choice.next === `${id}_01`)) {
-      SCENES.intro.choices.splice(Math.max(1, SCENES.intro.choices.length - 1), 0, { label: entryLabel, next: `${id}_01`, primary: false });
+  LARGE_EXPANSION.openings.forEach((profile) => {
+    addBranchingOpening(profile);
+    if (!SCENES.intro.choices.some((choice) => choice.next === `${profile.id}_01`)) {
+      SCENES.intro.choices.splice(Math.max(1, SCENES.intro.choices.length - 1), 0, { label: profile.entryLabel, next: `${profile.id}_01`, primary: false });
     }
   });
+  addOpeningEchoChoices();
 
   SCENES.expandedMainlineHub = {
     chapter: "新增主线",

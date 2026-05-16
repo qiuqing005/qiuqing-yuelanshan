@@ -70,6 +70,28 @@ async function drainGeneratedFlow(page) {
   throw new Error("Generated flow did not settle within 100 steps.");
 }
 
+async function assertBranchingOpening(page, entryLabel, expectedEchoPrefix) {
+  await click(page, entryLabel);
+  let sawBranch = false;
+  for (let guard = 0; guard < 12; guard += 1) {
+    const state = await page.evaluate(() => ({
+      code: document.querySelector("#sceneCode")?.textContent?.trim() || "",
+      labels: Array.from(document.querySelectorAll(".choice")).map((button) => button.textContent?.trim() || ""),
+    }));
+    if (!/^OPENING\d+-/.test(state.code)) {
+      await clickChoiceStartingWith(page, expectedEchoPrefix);
+      return;
+    }
+    if (state.labels.length >= 2) sawBranch = true;
+    const filler = state.labels.find((label) => /^继续.+第 \d+ 段$/.test(label));
+    if (filler) throw new Error(`Opening still exposes linear filler choice: ${filler}`);
+    if (!state.labels.length) throw new Error(`Opening ${entryLabel} reached a dead end at ${state.code}.`);
+    await click(page, state.labels[0]);
+  }
+  if (!sawBranch) throw new Error(`Opening ${entryLabel} did not expose branching choices.`);
+  throw new Error(`Opening ${entryLabel} did not settle into a downstream scene.`);
+}
+
 async function assertNoChoiceRiskHints(page) {
   const offenders = await page.evaluate(() =>
     Array.from(document.querySelectorAll(".choice")).flatMap((button) => {
@@ -198,6 +220,14 @@ if (!endingArchiveText.includes("过早告白") || !endingArchiveText.includes("
 }
 await screenshot(earlyEnding.page, "desktop-ending-archive.png");
 await earlyEnding.context.close();
+
+const openingBranch = await newPage(1366, 900);
+await openingBranch.page.goto(baseUrl, { waitUntil: "networkidle" });
+await openingBranch.page.evaluate(() => localStorage.clear());
+await openingBranch.page.reload({ waitUntil: "networkidle" });
+await assertBranchingOpening(openingBranch.page, "从门缝里的雨声开局", "把门缝雨声和纸灰并在一起");
+await screenshot(openingBranch.page, "desktop-branching-opening.png");
+await openingBranch.context.close();
 
 const desktop = await newPage(1366, 900);
 await desktop.page.goto(baseUrl, { waitUntil: "networkidle" });

@@ -7,7 +7,7 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-const RESOURCE_VERSION = "202605162151";
+const RESOURCE_VERSION = "202605162330";
 
 function versionedAssetUrl(value) {
   const text = String(value || "");

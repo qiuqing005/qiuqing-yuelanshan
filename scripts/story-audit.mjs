@@ -81,12 +81,38 @@ const openingGroups = assertGeneratedGroups("opening", 8, 20);
 const theaterGroups = assertGeneratedGroups("theater", 12, 40);
 const mainlineGroups = assertGeneratedGroups("mainline", 3, 80);
 
+let openingEchoChoiceCount = 0;
 for (const groupId of openingGroups.keys()) {
   const entry = `${groupId}_01`;
   if (!(SCENES.intro.choices || []).some((choice) => choice.next === entry)) {
     errors.push(`Opening ${groupId} is not reachable from intro.`);
   }
+  const items = openingGroups.get(groupId) || [];
+  const first = items.find((item) => item.sceneId === entry)?.scene;
+  if ((first?.choices || []).length < 2) errors.push(`Opening ${groupId} starts as a line instead of a branching opening.`);
+  const branchScenes = items.filter(({ scene }) => (scene.choices || []).length >= 2);
+  if (branchScenes.length < 6) errors.push(`Opening ${groupId} has only ${branchScenes.length} branching nodes.`);
+  const linearLabels = items.flatMap(({ sceneId, scene }) =>
+    (scene.choices || [])
+      .filter((choice) => /^继续.+第 \d+ 段$/.test(choice.label || ""))
+      .map((choice) => `${sceneId}: ${choice.label}`)
+  );
+  if (linearLabels.length) errors.push(`Opening ${groupId} still has linear filler choices:\n${linearLabels.join("\n")}`);
+  const exits = new Set(items.flatMap(({ scene }) =>
+    (scene.choices || [])
+      .map((choice) => choice.next || "")
+      .filter((target) => target && !target.startsWith(`${groupId}_`))
+  ));
+  if (exits.size < 4) errors.push(`Opening ${groupId} has only ${exits.size} distinct downstream exits.`);
 }
+
+for (const [, scene] of Object.entries(SCENES)) {
+  for (const choice of scene.choices || []) {
+    if ((choice.showFlags || []).some((flag) => /^opening\d+/.test(flag))) openingEchoChoiceCount += 1;
+  }
+}
+if (openingEchoChoiceCount < 8) errors.push(`Expected at least 8 downstream opening echo choices, found ${openingEchoChoiceCount}.`);
+
 
 if (!SCENES.expandedMainlineHub) errors.push("Missing expandedMainlineHub.");
 for (const groupId of mainlineGroups.keys()) {

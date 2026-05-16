@@ -30,7 +30,7 @@ body {
   background:
     linear-gradient(90deg, rgba(3, 5, 6, 0.9), rgba(3, 5, 6, 0.54) 48%, rgba(3, 5, 6, 0.22)),
     linear-gradient(180deg, rgba(3, 5, 6, 0.1), rgba(3, 5, 6, 0.88)),
-    var(--cover, url("./assets/images/bg-festival-road.png?v=202605162151")) center / cover;
+    var(--cover, url("./assets/images/bg-festival-road.png?v=202605162330")) center / cover;
 }
 
 .landing::before {
